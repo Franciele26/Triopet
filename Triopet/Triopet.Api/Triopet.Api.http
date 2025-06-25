@@ -1,0 +1,6 @@
+@Triopet.Api_HostAddress = http://localhost:5115
+
+GET {{Triopet.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
