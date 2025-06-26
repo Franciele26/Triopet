@@ -8,5 +8,7 @@ namespace Triopet.BusinessContext.Entities
 {
     public class Entry
     {
+        public int EntryId { get; set; }
+        public DateTime EntryDate { get; set; }
     }
 }

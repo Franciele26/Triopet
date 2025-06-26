@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Triopet.BusinessContext.Entities
 {
-    public class Exit
+    public class Category
     {
-        public int ExitId { get; set; }
-        public DateTime ExitDate { get; set; }
-        public int MotifId { get; set; }
+        public int CategoryId { get; set; }
+        public string CategoryName { get; set; }
+
     }
 }
