@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Triopet.Shared.Models
 {
-    internal class Product
+    public class ProductExitDto
     {
+        public int ProductId { get; set; }
+        public int ExitId { get; set; }
+        public int Quantity { get; set; }
     }
 }

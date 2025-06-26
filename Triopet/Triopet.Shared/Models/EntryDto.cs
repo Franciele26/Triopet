@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Triopet.Shared.Models
 {
-    internal class Exit
+    public class EntryDto
     {
+        public int Id { get; set; }
+        public DateTime DateOfEntry { get; set; }
+
     }
 }

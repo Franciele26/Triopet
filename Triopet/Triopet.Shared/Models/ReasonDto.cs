@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Triopet.Shared.Models
 {
-    internal class Reason
+    public class ReasonDto
     {
+        public int Id { get; set; }
+        public string Reason { get; set; } = string.Empty;
     }
 }
