@@ -50,6 +50,7 @@ namespace Triopet.Api.Controllers
                 var firstImage = await _businessContext.Images
                         .Where(i => i.ProductId == product.Id)
                         .OrderBy(i => i.ProductId)
+                        .Take(1)
                         .Select(i => new ImageDto
                         {
                             Id = i.Id,
