@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Triopet.BusinessContext.Entities
 {
-    public class Motif
+    public class Motif : BaseEntity
     {
-        public int MotifId { get; set; }
         public string Reason { get; set; }
     }
 }

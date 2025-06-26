@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Triopet.BusinessContext.Entities
 {
-    public class Exit
+    public class Exit : BaseEntity
     {
-        public int ExitId { get; set; }
         public DateTime ExitDate { get; set; }
         public int MotifId { get; set; }
     }
