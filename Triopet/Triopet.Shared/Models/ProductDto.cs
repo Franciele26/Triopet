@@ -14,6 +14,6 @@ namespace Triopet.Shared.Models
         public Decimal PricePerUnit { get; set; }
         public CategoryDto Category { get; set; }
         public AnimalTypeDto AnimalType { get; set; }
-        public List<ImageDto> Images { get; set; } = new();
+        public List<ImageDto> Images { get; set; } = new List<ImageDto>();
     }
 }
