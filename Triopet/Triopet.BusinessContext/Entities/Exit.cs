@@ -10,5 +10,6 @@ namespace Triopet.BusinessContext.Entities
     {
         public DateTime ExitDate { get; set; }
         public int MotifId { get; set; }
+        public Motif Motif { get; set; }
     }
 }
