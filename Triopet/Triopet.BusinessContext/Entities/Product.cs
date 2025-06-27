@@ -13,6 +13,8 @@ namespace Triopet.BusinessContext.Entities
         public decimal Price { get; set; }
         public int CategoryId { get;set; }
         public int AnimalTypeId { get; set; }
+        public Category Category { get; set; }
+        public AnimalType AnimalType { get; set; }
 
     }
 }
