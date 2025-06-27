@@ -19,7 +19,7 @@ namespace Triopet.Api.Controllers
             _businessContext = businessContext;
         }
 
-        [HttpGet("/")]
+        [HttpGet("/getimages")]
         public async Task<IActionResult> GetImages()
         {
 
@@ -39,6 +39,54 @@ namespace Triopet.Api.Controllers
             }
 
             return Ok(ImageList);
+        }
+
+        [HttpPost("/addimage")]
+        public async Task<IActionResult> AddImage([FromBody] Image? image)
+        {
+            if (image == null)
+            {
+                return BadRequest("Invalid image data.");
+            }
+            var newImage = new BusinessContext.Entities.Image
+            {
+                ImageName = image.ImageName,
+                ImageUrl = image.ImageUrl,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _businessContext.Images.Add(newImage);
+
+            await _businessContext.SaveChangesAsync(true);
+
+            var result = await _businessContext.SaveChangesAsync(true);
+            if (result > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "mensagem de erro");
+            }
+
+        }
+        [HttpDelete("/deleteimage")]
+        public async Task<IActionResult> DeleteImage(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Invalid image data.");
+            }
+            var existingImage = await _businessContext.Images.FindAsync(id);
+            if (existingImage == null)
+            {
+                return NotFound("Image not found.");
+            }
+            existingImage.IsDeleted = true;
+            existingImage.UpdatedAt = DateTime.UtcNow;
+            await _businessContext.SaveChangesAsync(true);
+            return NoContent();
         }
     }
 }
