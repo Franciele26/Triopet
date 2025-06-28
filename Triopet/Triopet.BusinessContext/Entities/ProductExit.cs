@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Triopet.BusinessContext.Entities
 {
-    public class ProductExit
+    public class ProductExit : BaseEntity
     {
         public int ProductId { get; set; }
         public Product Product { get; set; }

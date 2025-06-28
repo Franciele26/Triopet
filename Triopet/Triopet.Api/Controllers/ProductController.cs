@@ -22,6 +22,9 @@ namespace Triopet.Api.Controllers
         public async Task<IActionResult> GetProducts()
         {
             var products = await _businessContext.Products
+                .Include(c => c.Category)
+                .Include(t => t.AnimalType)
+                .Include(i => i.Images)
                 .Where(x => x.IsDeleted.Equals(false)).ToListAsync();
 
             var productsIds = products.Select(p => p.Id).ToList();
@@ -29,46 +32,36 @@ namespace Triopet.Api.Controllers
             List<ProductDto> productsList = new List<ProductDto>();
             foreach (var product in products)
             {
-                //criar categoria
-                var category = await _businessContext.Categories
-                    .Select(c => new CategoryDto 
-                    {
-                        Id = c.Id,
-                        Category = c.CategoryName,
-                    })
-                    .FirstOrDefaultAsync(c => c.Id == product.CategoryId);
-
-                //criar tipo
-                var animalType = await _businessContext.AnimalTypes
-                    .Select(a => new AnimalTypeDto
-                    {
-                        Id = a.Id,
-                        AnimalType = a.Type,
-                    })
-                    .FirstOrDefaultAsync(a => a.Id == product.AnimalTypeId);
-
-                //Converter firstImage para imageDto para ser utilizado em baixo
-                var firstImage = await _businessContext.Images
-                        .Where(i => i.ProductId == product.Id)
-                        .OrderBy(i => i.ProductId)
-                        .Take(1)
-                        .Select(i => new ImageDto
-                        {
-                            Id = i.Id,
-                            Url = i.ImageUrl,
-                            Name = i.ImageName,
-                        })
-                        .ToListAsync();
-
                 var newProductDto = new ProductDto
                 {
                     Id = product.Id,
                     Name = product.Name,
                     Description = product.Description,
                     PricePerUnit = product.Price,
-                    Images = firstImage,
-                    Category = category,
-                    AnimalType = animalType,
+                    Images = product.Images.Any()
+                    ? new List<ImageDto>
+                    {
+                        product.Images
+                            .OrderBy(img => img.Id)
+                            .Select(img => new ImageDto
+                            {
+                                Id = img.Id,
+                                Name = img.ImageName,
+                                Url = img.ImageUrl
+                            })
+                            .First()
+                    }
+                    : new List<ImageDto>(),
+                    Category = new CategoryDto
+                    {
+                        Id = product.Category.Id,
+                        Category = product.Category.CategoryName,
+                    },
+                    AnimalType = new AnimalTypeDto
+                    {
+                        Id = product.AnimalType.Id,
+                        AnimalType = product.AnimalType.Type,
+                    },
                 };
                 productsList.Add(newProductDto);
             }
@@ -120,7 +113,7 @@ namespace Triopet.Api.Controllers
 
             var foundProduct = await _businessContext.Products.FindAsync(id);
 
-            if(foundProduct == null)
+            if (foundProduct == null)
             {
                 return NotFound("Product not found");
             }
