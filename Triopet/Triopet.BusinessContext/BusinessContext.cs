@@ -27,6 +27,14 @@ namespace Triopet.BusinessContext
         public DbSet<ProductEntry> ProductEntries { get; set; }
         public DbSet<ProductExit> ProductExits { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProductEntry>()
+                .HasKey(pe => new { pe.EntryId, pe.ProductId });
+            modelBuilder.Entity<ProductExit>()
+                .HasKey(pe=> new { pe.ExitId, pe.ProductId });
+            base.OnModelCreating(modelBuilder);
+           
+        }
     }
-
 }
