@@ -11,5 +11,6 @@ namespace Triopet.Shared.Models
         public int Id { get; set; }
         public string Url { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public int ProductId { get; set; }
     }
 }
