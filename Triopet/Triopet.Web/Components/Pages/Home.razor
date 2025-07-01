@@ -1,7 +1,75 @@
 ﻿@page "/"
+@inject IApiService ApiService
+@inject NavigationManager NavigationManager
+@using Models
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h3>@Message</h3>
 
-Welcome to your new app.
+@if (Products.Any())
+{
+    <ul>
+        @foreach (var product in Products)
+        {
+            <li>@product.Name</li>
+        }
+    </ul>
+}
+else
+{
+    <p>Nenhum produto disponível.</p>
+}
+
+@code {
+    private string Message { get; set; } = string.Empty;
+    private List<Product> Products { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Products = await ApiService.GetProductsAsync();
+        }
+        catch (Exception)
+        {
+            Message = "Erro ao buscar produtos!";
+        }
+    }
+
+    private async Task OnDeleteProduct(Product product)
+    {
+       await ApiService.DeleteProduct(product.Id);
+       Products = await ApiService.GetProductsAsync();
+    }
+
+    private void OnOpenProduct(int id)
+    {
+        NavigationManager.NavigateTo($"addproduct/{id}");
+    }
+}
+
+
+
+@* @* // COLOCAR NO MUDBLAZOR 
+    <MudTable Items="@Products" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Id</MudTh>
+        <MudTh>Imagem</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Surname"></MudTd>
+        <MudTd DataLabel="Address"></MudTd>
+        <MudTd DataLabel="Email" HideSmall="_hidePosition"></MudTd>
+        <MudTd DataLabel="Action">
+        <MudButton @onclick="() => OnOpenProduct(context.Id)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowRight" Color="Color.Error">Open</MudButton>
+
+       <MudButton @onclick="() =>OnDeleteProduct(context)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Delete</MudButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+ *@
