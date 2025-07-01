@@ -1,7 +1,7 @@
 ﻿@page "/"
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
-@using Models
+@using Triopet.Shared.Models
 
 <PageTitle>Home</PageTitle>
 
@@ -23,13 +23,14 @@ else
 
 @code {
     private string Message { get; set; } = string.Empty;
-    private List<Product> Products { get; set; } = new();
+    private List<ProductDto> Products { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            Products = await ApiService.GetProductsAsync();
+            Products = (await ApiService.GetProductsAsync()).ToList();
+            await Task.Delay(300);
         }
         catch (Exception)
         {
@@ -37,7 +38,7 @@ else
         }
     }
 
-    private async Task OnDeleteProduct(Product product)
+    private async Task OnDeleteProduct(ProductDto product)
     {
        await ApiService.DeleteProduct(product.Id);
        Products = await ApiService.GetProductsAsync();
