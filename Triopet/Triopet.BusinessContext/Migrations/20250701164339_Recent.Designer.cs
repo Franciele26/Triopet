@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Triopet.BusinessContext;
 
@@ -11,9 +12,11 @@ using Triopet.BusinessContext;
 namespace Triopet.BusinessContext.Migrations
 {
     [DbContext(typeof(BusinessContext))]
-    partial class BusinessContextModelSnapshot : ModelSnapshot
+    [Migration("20250701164339_Recent")]
+    partial class Recent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,14 +238,17 @@ namespace Triopet.BusinessContext.Migrations
 
             modelBuilder.Entity("Triopet.BusinessContext.Entities.ProductEntry", b =>
                 {
-                    b.Property<int>("EntryId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("EntryId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -250,13 +256,18 @@ namespace Triopet.BusinessContext.Migrations
                     b.Property<decimal>("PriceUnit")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("EntryId", "ProductId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("EntryId");
 
                     b.HasIndex("ProductId");
 
@@ -265,17 +276,23 @@ namespace Triopet.BusinessContext.Migrations
 
             modelBuilder.Entity("Triopet.BusinessContext.Entities.ProductExit", b =>
                 {
-                    b.Property<int>("ExitId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ExitId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -283,7 +300,9 @@ namespace Triopet.BusinessContext.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("ExitId", "ProductId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExitId");
 
                     b.HasIndex("ProductId");
 
@@ -315,7 +334,7 @@ namespace Triopet.BusinessContext.Migrations
             modelBuilder.Entity("Triopet.BusinessContext.Entities.Product", b =>
                 {
                     b.HasOne("Triopet.BusinessContext.Entities.AnimalType", "AnimalType")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("AnimalTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -367,11 +386,6 @@ namespace Triopet.BusinessContext.Migrations
                     b.Navigation("Exit");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Triopet.BusinessContext.Entities.AnimalType", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Triopet.BusinessContext.Entities.Category", b =>

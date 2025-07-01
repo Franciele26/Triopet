@@ -1,0 +1,40 @@
+﻿@page "/addproduct"
+@using Triopet.Web.Models
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Adicionar Produto</h3>
+
+<div class="form-group">
+    <label>Nome:</label>
+    <input @bind="NewProduct.Name" class="form-control" />
+</div>
+
+<div class="form-group">
+    <label>Preço:</label>
+    <input type="number" step="0.01" @bind="NewProduct.Price" class="form-control" />
+</div>
+
+<button @onclick="SalvarProduto" class="btn btn-primary mt-2">Salvar</button>
+<button @onclick="Voltar" class="btn btn-secondary mt-2 ms-2">Cancelar</button>
+
+@if (!string.IsNullOrEmpty(Mensagem))
+{
+    <p class="text-success mt-3">@Mensagem</p>
+}
+
+@code {
+    private Product NewProduct = new();
+    private string Mensagem = string.Empty;
+
+    private void SalvarProduto()
+    {
+        Mensagem = $"Produto '{NewProduct.Name}' cadastrado com sucesso!";
+        NewProduct = new Product();
+    }
+
+    private void Voltar()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
