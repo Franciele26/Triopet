@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Triopet.BusinessContext.Entities
 {
-    public class Image : BaseEntity
+    public class Image : ExtraEntity
     {
         public string ImageName { get; set; }
         public int ProductId { get; set; }
