@@ -9,6 +9,6 @@ namespace Triopet.Shared.Models
     public class AnimalTypeDto
     {
         public int Id { get; set; }
-        public string TipoAnimal { get; set; } = string.Empty;
+        public string AnimalType { get; set; } = string.Empty;
     }
 }
