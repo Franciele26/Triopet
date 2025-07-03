@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Triopet.BusinessContext;
 using Triopet.BusinessContext.Entities;
 using Triopet.Shared;
+using Triopet.Shared.Models;
 
 namespace Triopet.Api.Controllers
 {
@@ -25,14 +26,15 @@ namespace Triopet.Api.Controllers
 
             var images = await _businessContext.Images.ToListAsync();
 
-            List<Image> ImageList = new List<Image>();
+            List<ImageDto> ImageList = new List<ImageDto>();
+
             foreach (var image in images)
             {
-                var ImageDto = new Image
+                var ImageDto = new ImageDto
                 {
                     Id = image.Id,
-                    ImageUrl = image.ImageUrl,
-                    ImageName = image.ImageName
+                    Url = image.ImageUrl,
+                    Name = image.ImageName
                 };
 
                 ImageList.Add(ImageDto);
@@ -42,7 +44,7 @@ namespace Triopet.Api.Controllers
         }
 
         [HttpPost("/addimage")]
-        public async Task<IActionResult> AddImage([FromBody] Image? image)
+        public async Task<IActionResult> AddImage([FromBody] ImageDto? image)
         {
             if (image == null)
             {
@@ -50,15 +52,16 @@ namespace Triopet.Api.Controllers
             }
             var newImage = new BusinessContext.Entities.Image
             {
-                ImageName = image.ImageName,
-                ImageUrl = image.ImageUrl,
+                ImageName = image.Name,
+                ImageUrl = image.Url,
+                ProductId = image.ProductId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             _businessContext.Images.Add(newImage);
 
-            await _businessContext.SaveChangesAsync(true);
+            //await _businessContext.SaveChangesAsync(true);
 
             var result = await _businessContext.SaveChangesAsync(true);
             if (result > 0)
@@ -71,7 +74,7 @@ namespace Triopet.Api.Controllers
             }
 
         }
-        [HttpDelete("/deleteimage")]
+        [HttpDelete("/deleteimage/{id}")]
         public async Task<IActionResult> DeleteImage(int id)
         {
             if (id <= 0)
