@@ -23,7 +23,18 @@ namespace Triopet.Api.Controllers
         [HttpGet("/entries")]
         public async Task<IActionResult> GetEntries()
         {
-            var entries = await _businessContext.Entries.ToListAsync();
+            var entries = await _businessContext.Entries
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.Category)
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.AnimalType)
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.Images)
+                .Where(d => !d.IsDeleted)
+                .ToListAsync();
 
             List<EntryDto> entryList = new List<EntryDto>();
 
@@ -32,9 +43,34 @@ namespace Triopet.Api.Controllers
                 var entryDto = new EntryDto
                 {
                     Id = entry.Id,
-                    DateOfEntry = entry.EntryDate
+                    DateOfEntry = entry.EntryDate,
+                    ProductEntries = entry.ProductEntries
+                    .Select(pe => new ProductEntryDto
+                    {
+                        EntryId = pe.EntryId,
+                        ProductId = pe.ProductId,
+                        Quantity = pe.Quantity,
+                        PriceUnitOfEntry = pe.PriceUnit,
+                        Product = new ProductDto
+                        {
+                            Id = pe.Product.Id,
+                            Name = pe.Product.Name,
+                            Description = "",
+                            PricePerUnit = pe.Product.Price,
+                            Category = new CategoryDto
+                            {
+                                Id = pe.Product.Category.Id,
+                                Category = pe.Product.Category.CategoryName,
+                            },
+                            AnimalType = new AnimalTypeDto
+                            {
+                                Id = pe.Product.AnimalType.Id,
+                                AnimalType = pe.Product.AnimalType.Type,
+                            },
+                            Images = new List<ImageDto>()
 
-
+                        }
+                    }).ToList()
                 };
 
                 entryList.Add(entryDto);
@@ -42,6 +78,7 @@ namespace Triopet.Api.Controllers
 
             return Ok(entryList);
         }
+        //Criar um novo ProdutDto para as listas
         [HttpGet("/entries/{id}")]
         public async Task<Entry> GetEntryById(int id)
         {
@@ -52,7 +89,7 @@ namespace Triopet.Api.Controllers
                     Id = x.Id,
                     EntryDate = x.EntryDate
                 }).FirstOrDefaultAsync();
-        
+
             if (entry == null)
             {
                 return new Entry();
@@ -60,6 +97,7 @@ namespace Triopet.Api.Controllers
             }
             return entry;
         }
+
         [HttpPost("/entries")]
         public async Task<IActionResult> AddEntry([FromBody] EntryDto? entry)
         {
@@ -120,7 +158,7 @@ namespace Triopet.Api.Controllers
             }
             existingEntry.Id = entry.Id;
             existingEntry.EntryDate = DateTime.UtcNow;
-            
+
             await _businessContext.SaveChangesAsync(true);
 
             return Ok();
