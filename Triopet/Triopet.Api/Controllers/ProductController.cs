@@ -24,7 +24,8 @@ namespace Triopet.Api.Controllers
             var products = await _businessContext.Products
                 .Include(c => c.Category)
                 .Include(t => t.AnimalType)
-                .Include(i => i.Images)
+                //.Include(i => i.Images)
+                .Include(i => i.Images.Where(img => img.IsDeleted.Equals(false)))
                 .Where(x => x.IsDeleted.Equals(false)).ToListAsync();
 
             var productsIds = products.Select(p => p.Id).ToList();
@@ -47,7 +48,8 @@ namespace Triopet.Api.Controllers
                             {
                                 Id = img.Id,
                                 Name = img.ImageName,
-                                Url = img.ImageUrl
+                                Url = img.ImageUrl,
+                                ProductId = img.ProductId
                             })
                             .First()
                     }
