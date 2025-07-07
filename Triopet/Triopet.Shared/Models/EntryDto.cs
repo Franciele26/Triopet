@@ -10,6 +10,7 @@ namespace Triopet.Shared.Models
     {
         public int Id { get; set; }
         public DateTime DateOfEntry { get; set; }
+        public List<ProductEntryDto> ProductEntries { get; set; } = new List<ProductEntryDto>();
 
     }
 }
