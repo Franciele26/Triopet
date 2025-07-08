@@ -143,7 +143,6 @@ namespace Triopet.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete product");
             }
-
         }
 
         [HttpGet("/products/{id}")]
