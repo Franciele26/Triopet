@@ -208,9 +208,16 @@ namespace Triopet.Api.Controllers
             existingEntry.Id = entry.Id;
             existingEntry.EntryDate = DateTime.UtcNow;
 
-            await _businessContext.SaveChangesAsync(true);
+            var response = await _businessContext.SaveChangesAsync(true);
 
-            return Ok();
+            if (response > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Error trying to edit the entry");
+            }
         }
     }
 }
