@@ -80,19 +80,55 @@ namespace Triopet.Api.Controllers
         }
         //Criar um novo ProdutDto para as listas
         [HttpGet("/entries/{id}")]
-        public async Task<Entry> GetEntryById(int id)
+        public async Task<EntryDto> GetEntryById(int id)
         {
             var entry = await _businessContext.Entries
-                .Where(x => x.Id == id && x.IsDeleted.Equals(false))
-                .Select(x => new Entry
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.Category)
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.AnimalType)
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.Images)
+                .Where(d => !d.IsDeleted)
+                .Select(et => new EntryDto
                 {
-                    Id = x.Id,
-                    EntryDate = x.EntryDate
+                    Id = et.Id,
+                    DateOfEntry = et.EntryDate,
+                    ProductEntries = et.ProductEntries
+                    .Select(pe => new ProductEntryDto
+                    {
+                        EntryId = pe.EntryId,
+                        ProductId = pe.ProductId,
+                        Quantity = pe.Quantity,
+                        PriceUnitOfEntry = pe.PriceUnit,
+                        Product = new ProductDto
+                        {
+                            Id = pe.Product.Id,
+                            Name = pe.Product.Name,
+                            Description = "",
+                            PricePerUnit = pe.Product.Price,
+                            Category = new CategoryDto
+                            {
+                                Id = pe.Product.Category.Id,
+                                Category = pe.Product.Category.CategoryName,
+                            },
+                            AnimalType = new AnimalTypeDto
+                            {
+                                Id = pe.Product.AnimalType.Id,
+                                AnimalType = pe.Product.AnimalType.Type,
+                            },
+                            Images = new List<ImageDto>()
+
+                        }
+                    }).ToList(),
                 }).FirstOrDefaultAsync();
 
             if (entry == null)
             {
-                return new Entry();
+                return new EntryDto();
 
             }
             return entry;
