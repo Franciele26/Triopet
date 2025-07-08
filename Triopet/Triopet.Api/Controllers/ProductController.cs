@@ -40,6 +40,7 @@ namespace Triopet.Api.Controllers
                     Name = product.Name,
                     Description = product.Description,
                     PricePerUnit = product.Price,
+                    Quantity = product.Quantity,
                     Images = product.Images.Any()
                     ? new List<ImageDto>
                     {
@@ -82,6 +83,7 @@ namespace Triopet.Api.Controllers
                 Name = newProduct.Name,
                 Description = newProduct.Description,
                 Price = newProduct.PricePerUnit,
+                Quantity = newProduct.Quantity,
                 CategoryId = newProduct.Category.Id,
                 AnimalTypeId = newProduct.AnimalType.Id,
                 IsDeleted = false
@@ -178,6 +180,7 @@ namespace Triopet.Api.Controllers
                         Id = z.AnimalType.Id,
                         AnimalType = z.AnimalType.Type,
                     },
+                    Quantity = z.Quantity,
                 }).FirstOrDefaultAsync();
 
             if (product == null)
@@ -208,6 +211,7 @@ namespace Triopet.Api.Controllers
             existingProduct.AnimalTypeId = product.AnimalType.Id;
             existingProduct.CategoryId = product.Category.Id;
             existingProduct.Price = product.PricePerUnit;
+            existingProduct.Quantity = product.Quantity;
             //images como fazer? trato aqui ou no image controller
             existingProduct.UpdatedAt = DateTime.UtcNow;
 
