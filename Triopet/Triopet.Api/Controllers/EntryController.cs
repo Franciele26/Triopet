@@ -164,17 +164,30 @@ namespace Triopet.Api.Controllers
         {
             if (id <= 0)
             {
-                return BadRequest("Invalid entry data.");
+                return BadRequest("Error trying to find entry id");
             }
-            var existingEntry = await _businessContext.Entries.FindAsync(id);
-            if (existingEntry == null)
+
+            var foundEntry = await _businessContext.Entries.FindAsync(id);
+
+            if (foundEntry == null)
             {
-                return NotFound("Entry not found.");
+                return NotFound("Entry not found");
             }
-            existingEntry.IsDeleted = true;
-            existingEntry.UpdatedAt = DateTime.UtcNow;
-            await _businessContext.SaveChangesAsync(true);
-            return NoContent();
+
+            foundEntry.IsDeleted = true;
+            foundEntry.UpdatedAt = DateTime.UtcNow;
+
+            var response = await _businessContext.SaveChangesAsync(true);
+
+            if (response > 0)
+            {
+                return Ok(response);
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete entry");
+            }
+
         }
         [HttpPut("/entries")]
         public async Task<IActionResult> UpdateEntry([FromBody] Entry entry)
