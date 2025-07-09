@@ -12,6 +12,6 @@ namespace Triopet.Shared.Models
         public DateTime DateOfExit { get; set; }
         public int ReasonId { get; set; }
         public ReasonDto Reason { get; set; } = new ReasonDto();
-        public List<ProductExitDto> productExitDtos { get; set; } = new List<ProductExitDto>();
+        public List<ProductExitDto> ProductExitDtos { get; set; } = new List<ProductExitDto>();
     }
 }
