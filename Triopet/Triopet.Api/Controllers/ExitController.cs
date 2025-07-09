@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using Triopet.BusinessContext;
 using Triopet.BusinessContext.Entities;
 using Triopet.Shared.Models;
@@ -194,10 +196,119 @@ namespace Triopet.Api.Controllers
             }
         }
 
-        //[HttpPost("/exists")]
-        //public async Task<IActionResult> AddNewExitAction()
-        //{
+        [HttpPost("/exits")]
+        public async Task<IActionResult> AddNewExitAction([FromBody] ExitDto exitDto)
+        {
+            if (exitDto == null)
+            {
+                return BadRequest("Error trying to create the exitDto");
+            }
 
-        //}
+            var newExit = new Exit
+            {
+                ExitDate = DateTime.UtcNow,
+                MotifId = exitDto.ReasonId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsDeleted = false,
+                ProductExits = new List<ProductExit>()
+            };
+
+            foreach (var pe in exitDto.ProductExitDtos)
+            {
+                var product = await _businessContext.Products.FindAsync(pe.ProductId);
+                if (product == null)
+                    return NotFound($"Produto com ID {pe.ProductId} não encontrado.");
+
+                if (product.Quantity < pe.Quantity)
+                    return BadRequest($"Stock insuficiente para '{product.Name}'.");
+
+                product.Quantity -= pe.Quantity;
+                newExit.ProductExits.Add(new ProductExit
+                {
+                    ProductId = pe.ProductId,
+                    Quantity = pe.Quantity
+                });
+            }
+            _businessContext.Exits.Add(newExit);
+
+            var response = await _businessContext.SaveChangesAsync(true);
+
+            if (response > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Error trying to edit the exit log");
+            }
+        }
+
+        [HttpPut("/exits")]
+        public async Task<IActionResult> UpdateExits([FromBody] ExitDto exitDto)
+        {
+            if (exitDto.Id <= 0)
+            {
+                return BadRequest("Error trying to find that exit log");
+            }
+
+            var existingExitLog = await _businessContext.Exits
+                .Include(e => e.ProductExits)
+                .FirstOrDefaultAsync(e => e.Id == exitDto.Id);
+
+            if (existingExitLog == null)
+            {
+                return NotFound("Exit log not found");
+            }
+
+            //meter de volta o valor da quantidade
+            foreach (var item in existingExitLog.ProductExits)
+            {
+                var prod = await _businessContext.Products.FindAsync(item.ProductId);
+                if (prod != null)
+                {
+                    prod.Quantity += item.Quantity;
+                }
+            }
+
+            //atualizar os dados
+            existingExitLog.ExitDate = exitDto.DateOfExit;
+            existingExitLog.MotifId = exitDto.ReasonId;
+            existingExitLog.UpdatedAt = DateTime.UtcNow;
+
+            //apagar a lista atual
+            existingExitLog.ProductExits.Clear();
+
+            //a dicionar os novos ProductExits e subtrair stock dos produtos
+            foreach (var pe in exitDto.ProductExitDtos)
+            {
+                var prod = await _businessContext.Products.FindAsync(pe.ProductId);
+                if (prod == null)
+                    return NotFound($"Product {pe.ProductId} not found");
+
+                if (prod.Quantity < pe.Quantity)
+                    return BadRequest($"Insufficient stock for product '{prod.Name}'.");
+
+                prod.Quantity -= pe.Quantity;
+
+                existingExitLog.ProductExits.Add(new ProductExit
+                {
+                    ProductId = pe.ProductId,
+                    Quantity = pe.Quantity
+                });
+            }
+
+
+            var response = await _businessContext.SaveChangesAsync(true);
+
+            if (response > 0)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Error trying to edit the exit log");
+            }
+        }
     }
 }
