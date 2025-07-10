@@ -234,10 +234,14 @@ namespace Triopet.Api.Controllers
             {
                 var prod = await _businessContext.Products.FindAsync(pe.ProductId);
                 if (prod == null)
+                {
                     return NotFound($"Product {pe.ProductId} not found");
+                }
 
-                if (prod.Quantity < pe.Quantity)
-                    return BadRequest($"Insufficient stock for product '{prod.Name}'.");
+                if (pe.Quantity < 0 && prod.Quantity < pe.Quantity)
+                {
+                    return BadRequest($"Error while editing stock for product '{prod.Name}'.");
+                }
 
                 prod.Quantity -= pe.Quantity;
 
@@ -305,7 +309,7 @@ namespace Triopet.Api.Controllers
             var response = await _businessContext.SaveChangesAsync(true);
             if (response > 0)
             {
-                return Ok(response);
+                return Ok($"Apagado com sucesso.\nResponse:{response}");
             }
             else
             {
@@ -313,43 +317,42 @@ namespace Triopet.Api.Controllers
             }
         }
 
-        [HttpDelete("/exits/{exitId}/products/{productId}")]
-        public async Task<IActionResult> DeleteProductFromExit(int exitId, int productId)
-        {
-            var exit = await _businessContext.Exits
-                .Include(e => e.ProductExits.Where(ep => !ep.IsDeleted))
-                .FirstOrDefaultAsync(e => e.Id == exitId && !e.IsDeleted);
+        //[HttpDelete("/exits/{exitId}/products/{productId}")]
+        //public async Task<IActionResult> DeleteProductFromExit(int exitId, int productId)
+        //{
+        //    var exit = await _businessContext.Exits
+        //        .Include(e => e.ProductExits.Where(ep => !ep.IsDeleted))
+        //        .FirstOrDefaultAsync(e => e.Id == exitId && !e.IsDeleted);
 
-            if (exit == null)
-            {
-                return NotFound("Exit not found.");
-            }
+        //    if (exit == null)
+        //    {
+        //        return NotFound("Exit not found.");
+        //    }
 
-            var productExit = exit.ProductExits.FirstOrDefault(pe => pe.ProductId == productId);
-            if (productExit == null)
-            {
-                return NotFound("Product not found in this exit.");
-            }
-            // devolver stock
-            var product = await _businessContext.Products.FindAsync(productId);
-            if (product != null)
-            {
-                product.Quantity += productExit.Quantity;
-            }
-            //exit.ProductExits.Remove(productExit);
-            productExit.IsDeleted = true;
-            exit.UpdatedAt = DateTime.UtcNow;
+        //    var productExit = exit.ProductExits.FirstOrDefault(pe => pe.ProductId == productId);
+        //    if (productExit == null)
+        //    {
+        //        return NotFound("Product not found in this exit.");
+        //    }
+        //    // devolver stock
+        //    var product = await _businessContext.Products.FindAsync(productId);
+        //    if (product != null)
+        //    {
+        //        product.Quantity += productExit.Quantity;
+        //    }
+        //    //exit.ProductExits.Remove(productExit);
+        //    productExit.IsDeleted = true;
+        //    exit.UpdatedAt = DateTime.UtcNow;
 
-            var result = await _businessContext.SaveChangesAsync(true);
-            if(result > 0)
-            {
-                return Ok();
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete exit");
-            }
-        }
-
+        //    var result = await _businessContext.SaveChangesAsync(true);
+        //    if (result > 0)
+        //    {
+        //        return Ok();
+        //    }
+        //    else
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete exit");
+        //    }
+        //}
     }
 }

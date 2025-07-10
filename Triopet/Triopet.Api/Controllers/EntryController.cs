@@ -56,6 +56,7 @@ namespace Triopet.Api.Controllers
                             Id = pe.Product.Id,
                             Name = pe.Product.Name,
                             Description = "",
+                            Quantity = pe.Product.Quantity,
                             PricePerUnit = pe.Product.Price,
                             Category = new CategoryDto
                             {
@@ -92,7 +93,7 @@ namespace Triopet.Api.Controllers
                 .Include(e => e.ProductEntries)
                     .ThenInclude(pe => pe.Product)
                         .ThenInclude(p => p.Images)
-                .Where(d => !d.IsDeleted)
+                .Where(d => !d.IsDeleted && d.Id == id)
                 .Select(et => new EntryDto
                 {
                     Id = et.Id,
@@ -109,6 +110,7 @@ namespace Triopet.Api.Controllers
                             Id = pe.Product.Id,
                             Name = pe.Product.Name,
                             Description = "",
+                            Quantity = pe.Product.Quantity,
                             PricePerUnit = pe.Product.Price,
                             Category = new CategoryDto
                             {
@@ -157,9 +159,10 @@ namespace Triopet.Api.Controllers
                 if (product == null)
                     return NotFound($"Produto com ID {pe.ProductId} não encontrado.");
 
-                if (product.Quantity < pe.Quantity)
-                    return BadRequest($"Stock insuficiente para '{product.Name}'.");
-
+                if (pe.Quantity < 0)
+                {
+                    return BadRequest($"Impossivel adicionar se for menor que 0, '{product.Name}'.");
+                }
                 product.Quantity += pe.Quantity;
                 newEntry.ProductEntries.Add(new ProductEntry
                 {
@@ -173,14 +176,14 @@ namespace Triopet.Api.Controllers
 
             if (response > 0)
             {
-                return Ok();
+                return Ok("Produto adicionado com sucesso");
             }
             else
             {
                 return StatusCode(StatusCodes.Status400BadRequest, "Error trying to edit the entry log");
             }
         }
-        [HttpPut("/deleteentries/id")]
+        [HttpDelete("/entries/{id}")]
         public async Task<IActionResult> DeleteEntry(int id)
         {
             if (id <= 0)
@@ -189,8 +192,8 @@ namespace Triopet.Api.Controllers
             }
 
             var foundEntry = await _businessContext.Entries
-                .Include(e => e.ProductEntries)
-                .FirstOrDefaultAsync(e => e.Id == id);
+                .Include(e => e.ProductEntries.Where(pe => !pe.IsDeleted))
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
 
             if (foundEntry == null)
             {
@@ -207,16 +210,8 @@ namespace Triopet.Api.Controllers
                 {
                     product.Quantity -= item.Quantity;
                 }
+                item.IsDeleted = true;
             }
-            /*
-             Se quisese remover os registos mesmo
-                // Remover os registos da tabela mista
-                _businessContext.ProductExits.RemoveRange(exit.ProductExits);
-
-                // Remover o Exit
-                _businessContext.Exits.Remove(exit);
-             */
-
 
             foundEntry.IsDeleted = true;
             foundEntry.UpdatedAt = DateTime.UtcNow;
@@ -224,13 +219,14 @@ namespace Triopet.Api.Controllers
             var response = await _businessContext.SaveChangesAsync(true);
             if (response > 0)
             {
-                return Ok(response);
+                return Ok($"Apagado com sucesso.\nResponse:{response}");
             }
             else
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete entry");
             }
         }
+
         [HttpPut("/entries")]
         public async Task<IActionResult> UpdateEntries([FromBody] EntryDto entryDto)
         {
@@ -248,7 +244,7 @@ namespace Triopet.Api.Controllers
                 return NotFound("Entry log not found");
             }
 
-            //meter de volta o valor da quantidade
+            //remover de volta o valor da quantidade
             foreach (var item in existingEntryLog.ProductEntries)
             {
                 var prod = await _businessContext.Products.FindAsync(item.ProductId);
@@ -265,15 +261,15 @@ namespace Triopet.Api.Controllers
             //apagar a lista atual
             existingEntryLog.ProductEntries.Clear();
 
-            //a dicionar os novos ProductExits e subtrair stock dos produtos
+            //adicionar os novos ProductExits e subtrair stock dos produtos
             foreach (var pe in entryDto.ProductEntries)
             {
                 var prod = await _businessContext.Products.FindAsync(pe.ProductId);
                 if (prod == null)
                     return NotFound($"Product {pe.ProductId} not found");
 
-                if (prod.Quantity < pe.Quantity)
-                    return BadRequest($"Insufficient stock for product '{prod.Name}'.");
+                if (pe.Quantity < 0)
+                    return BadRequest($"Impossible to add negative numbers to stock for product '{prod.Name}'.");
 
                 prod.Quantity += pe.Quantity;
 
@@ -289,7 +285,7 @@ namespace Triopet.Api.Controllers
 
             if (response > 0)
             {
-                return Ok();
+                return Ok("Entry was edited with success");
             }
             else
             {
