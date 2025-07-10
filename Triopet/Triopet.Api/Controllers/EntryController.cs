@@ -56,6 +56,7 @@ namespace Triopet.Api.Controllers
                             Id = pe.Product.Id,
                             Name = pe.Product.Name,
                             Description = "",
+                            Quantity = pe.Product.Quantity,
                             PricePerUnit = pe.Product.Price,
                             Category = new CategoryDto
                             {
@@ -80,88 +81,216 @@ namespace Triopet.Api.Controllers
         }
         //Criar um novo ProdutDto para as listas
         [HttpGet("/entries/{id}")]
-        public async Task<Entry> GetEntryById(int id)
+        public async Task<EntryDto> GetEntryById(int id)
         {
             var entry = await _businessContext.Entries
-                .Where(x => x.Id == id && x.IsDeleted.Equals(false))
-                .Select(x => new Entry
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.Category)
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.AnimalType)
+                .Include(e => e.ProductEntries)
+                    .ThenInclude(pe => pe.Product)
+                        .ThenInclude(p => p.Images)
+                .Where(d => !d.IsDeleted && d.Id == id)
+                .Select(et => new EntryDto
                 {
-                    Id = x.Id,
-                    EntryDate = x.EntryDate
+                    Id = et.Id,
+                    DateOfEntry = et.EntryDate,
+                    ProductEntries = et.ProductEntries
+                    .Select(pe => new ProductEntryDto
+                    {
+                        EntryId = pe.EntryId,
+                        ProductId = pe.ProductId,
+                        Quantity = pe.Quantity,
+                        PriceUnitOfEntry = pe.PriceUnit,
+                        Product = new ProductDto
+                        {
+                            Id = pe.Product.Id,
+                            Name = pe.Product.Name,
+                            Description = "",
+                            Quantity = pe.Product.Quantity,
+                            PricePerUnit = pe.Product.Price,
+                            Category = new CategoryDto
+                            {
+                                Id = pe.Product.Category.Id,
+                                Category = pe.Product.Category.CategoryName,
+                            },
+                            AnimalType = new AnimalTypeDto
+                            {
+                                Id = pe.Product.AnimalType.Id,
+                                AnimalType = pe.Product.AnimalType.Type,
+                            },
+                            Images = new List<ImageDto>()
+
+                        }
+                    }).ToList(),
                 }).FirstOrDefaultAsync();
 
             if (entry == null)
             {
-                return new Entry();
+                return new EntryDto();
 
             }
             return entry;
         }
 
         [HttpPost("/entries")]
-        public async Task<IActionResult> AddEntry([FromBody] EntryDto? entry)
+        public async Task<IActionResult> AddNewEntry([FromBody] EntryDto entryDto)
         {
-            if (entry == null)
+            if (entryDto == null)
             {
-                return BadRequest("Invalid entry data.");
+                return BadRequest("Error trying to create the entryDto");
             }
-            var newEntry = new BusinessContext.Entities.Entry
+
+            var newEntry = new Entry
             {
-                EntryDate = entry.DateOfEntry,
+                EntryDate = DateTime.UtcNow,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                IsDeleted = false,
+                ProductEntries = new List<ProductEntry>()
             };
 
+            foreach (var pe in entryDto.ProductEntries)
+            {
+                var product = await _businessContext.Products.FindAsync(pe.ProductId);
+                if (product == null)
+                    return NotFound($"Produto com ID {pe.ProductId} não encontrado.");
+
+                if (pe.Quantity < 0)
+                {
+                    return BadRequest($"Impossivel adicionar se for menor que 0, '{product.Name}'.");
+                }
+                product.Quantity += pe.Quantity;
+                newEntry.ProductEntries.Add(new ProductEntry
+                {
+                    ProductId = pe.ProductId,
+                    Quantity = pe.Quantity
+                });
+            }
             _businessContext.Entries.Add(newEntry);
 
-            await _businessContext.SaveChangesAsync(true);
+            var response = await _businessContext.SaveChangesAsync(true);
 
-            return CreatedAtAction(nameof(GetEntries), new { id = newEntry.Id }, new EntryDto
+            if (response > 0)
             {
-                Id = entry.Id,
-                DateOfEntry = entry.DateOfEntry
-
-            });
+                return Ok("Produto adicionado com sucesso");
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Error trying to edit the entry log");
+            }
         }
-        [HttpPut("/deleteentries/id")]
+        [HttpDelete("/entries/{id}")]
         public async Task<IActionResult> DeleteEntry(int id)
         {
             if (id <= 0)
             {
-                return BadRequest("Invalid entry data.");
+                return BadRequest("Error trying to find the entry log");
             }
-            var existingEntry = await _businessContext.Entries.FindAsync(id);
-            if (existingEntry == null)
+
+            var foundEntry = await _businessContext.Entries
+                .Include(e => e.ProductEntries.Where(pe => !pe.IsDeleted))
+                .FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+
+            if (foundEntry == null)
             {
-                return NotFound("Entry not found.");
+                return NotFound("Error trying to find entryId");
             }
-            existingEntry.IsDeleted = true;
-            existingEntry.UpdatedAt = DateTime.UtcNow;
-            await _businessContext.SaveChangesAsync(true);
-            return NoContent();
+
+            //devolver a quantidade dos items
+            foreach (var item in foundEntry.ProductEntries)
+            {
+                var product = await _businessContext.Products
+                    .FindAsync(item.ProductId);
+
+                if (product != null)
+                {
+                    product.Quantity -= item.Quantity;
+                }
+                item.IsDeleted = true;
+            }
+
+            foundEntry.IsDeleted = true;
+            foundEntry.UpdatedAt = DateTime.UtcNow;
+
+            var response = await _businessContext.SaveChangesAsync(true);
+            if (response > 0)
+            {
+                return Ok($"Apagado com sucesso.\nResponse:{response}");
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete entry");
+            }
         }
+
         [HttpPut("/entries")]
-        public async Task<IActionResult> UpdateEntry([FromBody] Entry entry)
+        public async Task<IActionResult> UpdateEntries([FromBody] EntryDto entryDto)
         {
-            if (entry.Id == 0)
+            if (entryDto.Id <= 0)
             {
-                return BadRequest("Error getting entry Id");
-
+                return BadRequest("Error trying to find that entry log");
             }
 
-            var existingEntry = await _businessContext.Entries.FindAsync(entry.Id);
+            var existingEntryLog = await _businessContext.Entries
+                .Include(e => e.ProductEntries)
+                .FirstOrDefaultAsync(e => e.Id == entryDto.Id);
 
-            if (existingEntry == null)
+            if (existingEntryLog == null)
             {
-                return NotFound("Patient not found");
-
+                return NotFound("Entry log not found");
             }
-            existingEntry.Id = entry.Id;
-            existingEntry.EntryDate = DateTime.UtcNow;
 
-            await _businessContext.SaveChangesAsync(true);
+            //remover de volta o valor da quantidade
+            foreach (var item in existingEntryLog.ProductEntries)
+            {
+                var prod = await _businessContext.Products.FindAsync(item.ProductId);
+                if (prod != null)
+                {
+                    prod.Quantity -= item.Quantity;
+                }
+            }
 
-            return Ok();
+            //atualizar os dados
+            existingEntryLog.EntryDate = entryDto.DateOfEntry;
+            existingEntryLog.UpdatedAt = DateTime.UtcNow;
+
+            //apagar a lista atual
+            existingEntryLog.ProductEntries.Clear();
+
+            //adicionar os novos ProductExits e subtrair stock dos produtos
+            foreach (var pe in entryDto.ProductEntries)
+            {
+                var prod = await _businessContext.Products.FindAsync(pe.ProductId);
+                if (prod == null)
+                    return NotFound($"Product {pe.ProductId} not found");
+
+                if (pe.Quantity < 0)
+                    return BadRequest($"Impossible to add negative numbers to stock for product '{prod.Name}'.");
+
+                prod.Quantity += pe.Quantity;
+
+                existingEntryLog.ProductEntries.Add(new ProductEntry
+                {
+                    ProductId = pe.ProductId,
+                    Quantity = pe.Quantity
+                });
+            }
+
+
+            var response = await _businessContext.SaveChangesAsync(true);
+
+            if (response > 0)
+            {
+                return Ok("Entry was edited with success");
+            }
+            else
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Error trying to edit the entry log");
+            }
         }
     }
 }
