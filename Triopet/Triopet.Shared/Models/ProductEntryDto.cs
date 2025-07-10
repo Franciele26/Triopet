@@ -12,6 +12,6 @@ namespace Triopet.Shared.Models
         public int EntryId { get; set; }
         public int Quantity { get; set; }
         public Decimal PriceUnitOfEntry { get; set; }
-        public ProductDto Product { get; set; } = new ProductDto();
+        public ProductDto? Product { get; set; } 
     }
 }

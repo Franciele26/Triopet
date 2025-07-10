@@ -15,5 +15,6 @@ namespace Triopet.Shared.Models
         public CategoryDto Category { get; set; }
         public AnimalTypeDto AnimalType { get; set; }
         public List<ImageDto> Images { get; set; } = new List<ImageDto>();
+        public int Quantity { get; set; }
     }
 }
