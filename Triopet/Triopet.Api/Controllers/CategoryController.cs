@@ -27,37 +27,46 @@ namespace Triopet.Api.Controllers
                 return NotFound("No categories found");
             }
 
-            var result = categories.Select(c => new CategoryDto
-            {
-                Id = c.Id,
-                Category = c.CategoryName
-            }).ToList();
+            var categoryList = new List<CategoryDto>();
 
-            return Ok(result);
+            //var result = categories.Select(c => new CategoryDto
+            //{
+            //    Id = c.Id,
+            //    Category = c.CategoryName
+            //}).ToList();
+
+            //ou assim
+            foreach (var item in categories)
+            {
+                var categoryDto = new CategoryDto
+                {
+                    Id = item.Id,
+                    Category = item.CategoryName,
+                };
+                categoryList.Add(categoryDto);
+            }
+
+            return Ok(categoryList);
         }
 
         [HttpGet("/categories/{id}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest("Invalid id");
-            }
 
-            var category = await _businessContext.Categories.FindAsync(id);
+            var category = await _businessContext.Categories
+                .Where(c => c.Id == id)
+                .Select(cat => new CategoryDto
+                {
+                    Id = cat.Id,
+                    Category = cat.CategoryName,
+                }).FirstOrDefaultAsync();
 
             if (category == null)
             {
-                return NotFound("Category not found");
+                return BadRequest("Error trying to find a certain category");
             }
 
-            var dto = new CategoryDto
-            {
-                Id = category.Id,
-                Category = category.CategoryName
-            };
-
-            return Ok(dto);
+            return Ok(category);
         }
     }
 }
