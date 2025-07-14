@@ -1,4 +1,5 @@
-﻿using Refit;
+﻿using Microsoft.AspNetCore.Mvc;
+using Refit;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,10 +24,13 @@ namespace Triopet.Web
         [Get("/categories")]
         Task<List<CategoryDto>> GetCategoriesAsync();
 
-        [Get("/animaltypes")]
+        [Get("/animaltype")]
         Task<List<AnimalTypeDto>> GetAnimalTypesAsync();
 
         [Get("/products/{id}")]
         Task<ProductDto> GetProductById(int id);
+
+        [Delete("/deleteimage/{id}")]
+        Task<HttpResponseMessage> DeleteImage(int id);
     }
 }
