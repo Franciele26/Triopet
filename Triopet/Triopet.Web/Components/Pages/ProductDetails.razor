@@ -1,0 +1,78 @@
+﻿@page "/productdetails/{Id:int}"
+@inject IApiService ApiService
+@inject NavigationManager NavigationManager
+@using Triopet.Shared.Models
+
+<h3>Detalhes do Produto</h3>
+
+@if (Produto == null)
+{
+    <MudText Color="Color.Error">Produto não encontrado.</MudText>
+}
+else
+{
+    <MudCard Class="p-4 mt-3">
+        <MudText><b>Nome:</b> @Produto.Name</MudText>
+@*      <MudText><b>Preço:</b> R$ @Produto.Price</MudText>
+        <MudText><b>Categoria ID:</b> @Produto.CategoryId</MudText>
+        <MudText><b>Tipo de Animal:</b> @Produto.AnimalTypeId</MudText>
+ *@        <MudText><b>Descrição:</b> @Produto.Description</MudText>
+        <MudText><b>Quantidade:</b> @Produto.Quantity</MudText>
+
+        <div class="mt-4">
+            <MudButton Color="Color.Primary" OnClick="EditarProduto">Editar</MudButton>
+            <MudButton Color="Color.Error" Class="ms-2" OnClick="ExcluirProduto">Excluir</MudButton>
+            <MudButton Color="Color.Secondary" Class="ms-2" OnClick="Voltar">Voltar</MudButton>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Mensagem))
+        {
+            <p class="text-success mt-3">@Mensagem</p>
+        }
+    </MudCard>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private ProductDto Produto;
+    private string Mensagem = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Produto = await ApiService.GetProductById(Id);
+        }
+        catch
+        {
+            Produto = null;
+        }
+    }
+
+    private void EditarProduto()
+    {
+        NavigationManager.NavigateTo($"/editproduct/{Id}");
+    }
+
+    private async Task ExcluirProduto()
+    {
+        try
+        {
+            await ApiService.DeleteProduct(Id);
+            Mensagem = "Produto excluído com sucesso!";
+            await Task.Delay(1000);
+            NavigationManager.NavigateTo("/");
+        }
+        catch
+        {
+            Mensagem = "Erro ao excluir o produto.";
+        }
+    }
+
+    private void Voltar()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}

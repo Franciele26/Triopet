@@ -19,5 +19,14 @@ namespace Triopet.Web
 
         [Delete("/products/{id}")]
         Task<HttpResponseMessage> DeleteProduct(int id);
+       
+        [Get("/categories")]
+        Task<List<CategoryDto>> GetCategoriesAsync();
+
+        [Get("/animaltypes")]
+        Task<List<AnimalTypeDto>> GetAnimalTypesAsync();
+
+        [Get("/products/{id}")]
+        Task<ProductDto> GetProductById(int id);
     }
 }
