@@ -10,6 +10,5 @@ namespace Triopet.BusinessContext.Entities
     {
         public DateTime EntryDate { get; set; }
         public ICollection<ProductEntry> ProductEntries { get; set; } = new List<ProductEntry>();
-        public int Quantity{ get; set; }
     }
 }

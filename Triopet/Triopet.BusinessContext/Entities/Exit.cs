@@ -12,6 +12,5 @@ namespace Triopet.BusinessContext.Entities
         public int MotifId { get; set; }
         public Motif Motif { get; set; }
         public ICollection<ProductExit> ProductExits { get; set; } = new List<ProductExit>();
-        public int Quantity { get; set; }
     }
 }

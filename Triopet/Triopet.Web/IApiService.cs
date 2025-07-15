@@ -32,5 +32,12 @@ namespace Triopet.Web
 
         [Delete("/deleteimage/{id}")]
         Task<HttpResponseMessage> DeleteImage(int id);
+
+        [Get("/entries")]
+        Task<List<EntryDto>> GetEntries();
+
+        [Get("/entries/{id}")]
+        Task<List<ProductEntryDto>>GetEntryAsync();
+
     }
 }
