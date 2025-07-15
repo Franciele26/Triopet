@@ -153,7 +153,7 @@ namespace Triopet.Api.Controllers
             var product = await _businessContext.Products
                 .Include(c => c.Category)
                 .Include(t => t.AnimalType)
-                .Include(i => i.Images.Where(img => img.IsDeleted.Equals(false)))
+                .Include(i => i.Images)
                 .Where(x => x.IsDeleted.Equals(false) && x.Id == id)
                 .Select(z => new ProductDto
                 {
@@ -161,7 +161,8 @@ namespace Triopet.Api.Controllers
                     Name = z.Name,
                     Description = z.Description,
                     PricePerUnit = z.Price,
-                    Images = z.Images.OrderBy(img => img.Id)
+                    Images = z.Images.Where(img => img.IsDeleted == false)
+                    .OrderBy(img => img.Id)
                         .Select(img => new ImageDto
                         {
                             Id = img.Id,
