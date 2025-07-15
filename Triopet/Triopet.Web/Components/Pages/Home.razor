@@ -1,76 +1,63 @@
 ﻿@page "/"
+@using Triopet.Shared.Models
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
-@using Triopet.Shared.Models
 
-<PageTitle>Home</PageTitle>
+<div style="background-color: #a0e7e5; min-height: 100vh; padding: 20px;">
+    <h3>Produtos Cadastrados</h3>
 
-<h3>@Message</h3>
+    @if (Produtos == null)
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+    else if (!Produtos.Any())
+    {
+        <MudText>Nenhum produto encontrado.</MudText>
+    }
+    else
+    {
+    <MudGrid>
+      @foreach (var produto in Produtos)
+      {
+        <MudItem xs="12" sm="6" md="4">
+          <MudCard Class="my-2">
+            <MudCardContent>
+              @if (produto.Images != null && produto.Images.Any())
+              {
+              <MudImage Src="@produto.Images.First().Url" Alt="@produto.Name" Width="100" Height="100" />
+              }
 
-@if (Products.Any())
-{
-    <ul>
-        @foreach (var product in Products)
-        {
-            <li>@product.Name</li>
-        }
-    </ul>
-}
-else
-{
-    <p>Nenhum produto disponível.</p>
-}
+             <MudText Typography="Typo.h6">@produto.Name</MudText>
+             <MudText>Qtd: @produto.Quantity</MudText>
+             <MudText>@produto.Description</MudText>
+             <MudText>Id: @produto.Id</MudText>
+             </MudCardContent>
+
+            <MudCardActions>
+              <MudLink Href=@($"/productdetails/{produto.Id}") Style="color: black;">
+                <MudButton Style="background-color: #d3d3d3;"
+                 Variant="Variant.Filled">
+                 Detalhes
+                </MudButton>
+              </MudLink>
+              @*<MudButton Style="background-color: #d3d3d3; color: black;"
+              Variant="Variant.Filled"
+              OnClick="@(() => NavigationManager.NavigateTo($"/productdetails/{produto.Id}"))">
+              Detalhes
+              </MudButton> *@                        
+            </MudCardActions>
+          </MudCard>
+        </MudItem>
+      }
+     </MudGrid>
+  }
+</div>
 
 @code {
-    private string Message { get; set; } = string.Empty;
-    private List<ProductDto> Products { get; set; } = new();
+    private List<ProductDto> Produtos;
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            Products = (await ApiService.GetProductsAsync()).ToList();
-            await Task.Delay(300);
-        }
-        catch (Exception)
-        {
-            Message = "Erro ao buscar produtos!";
-        }
-    }
-
-    private async Task OnDeleteProduct(ProductDto product)
-    {
-       await ApiService.DeleteProduct(product.Id);
-       Products = await ApiService.GetProductsAsync();
-    }
-
-    private void OnOpenProduct(int id)
-    {
-        NavigationManager.NavigateTo($"addproduct/{id}");
+        Produtos = await ApiService.GetProductsAsync();
     }
 }
-
-
-
-@* @* // COLOCAR NO MUDBLAZOR 
-    <MudTable Items="@Products" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info">
-    <HeaderContent>
-        <MudTh>Name</MudTh>
-        <MudTh>Id</MudTh>
-        <MudTh>Imagem</MudTh>
-        <MudTh>Email</MudTh>
-        <MudTh>Action</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Surname"></MudTd>
-        <MudTd DataLabel="Address"></MudTd>
-        <MudTd DataLabel="Email" HideSmall="_hidePosition"></MudTd>
-        <MudTd DataLabel="Action">
-        <MudButton @onclick="() => OnOpenProduct(context.Id)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowRight" Color="Color.Error">Open</MudButton>
-
-       <MudButton @onclick="() =>OnDeleteProduct(context)" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error">Delete</MudButton>
-        </MudTd>
-    </RowTemplate>
-</MudTable>
- *@

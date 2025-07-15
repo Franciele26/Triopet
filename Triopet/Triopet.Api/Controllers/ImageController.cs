@@ -24,7 +24,9 @@ namespace Triopet.Api.Controllers
         public async Task<IActionResult> GetImages()
         {
 
-            var images = await _businessContext.Images.ToListAsync();
+            var images = await _businessContext.Images
+                            .Where(img => !img.IsDeleted)
+                            .ToListAsync();
 
             List<ImageDto> ImageList = new List<ImageDto>();
 
@@ -82,14 +84,30 @@ namespace Triopet.Api.Controllers
                 return BadRequest("Invalid image data.");
             }
             var existingImage = await _businessContext.Images.FindAsync(id);
+
             if (existingImage == null)
             {
                 return NotFound("Image not found.");
             }
+
+            var activeImagesCount = await _businessContext.Images
+            .Where(img => img.ProductId == existingImage.ProductId && !img.IsDeleted && img.Id != id)
+            .CountAsync();
+
+            if (activeImagesCount == 0)
+            {
+                return BadRequest("Cannot delete the last active image of the product.");
+            }
+
+
             existingImage.IsDeleted = true;
             existingImage.UpdatedAt = DateTime.UtcNow;
-            await _businessContext.SaveChangesAsync(true);
-            return NoContent();
+            var affected = await _businessContext.SaveChangesAsync(true);
+
+            if (affected > 0)
+                return NoContent();
+            else
+                return StatusCode(500, "Failed to update the image deletion flag.");
         }
     }
 }
