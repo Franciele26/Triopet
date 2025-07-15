@@ -23,7 +23,7 @@ namespace Triopet.Web
         [Get("/categories")]
         Task<List<CategoryDto>> GetCategoriesAsync();
 
-        [Get("/animaltypes")]
+        [Get("/animaltype")]
         Task<List<AnimalTypeDto>> GetAnimalTypesAsync();
 
         [Get("/products/{id}")]
