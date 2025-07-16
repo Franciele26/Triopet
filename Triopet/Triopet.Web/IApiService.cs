@@ -32,5 +32,14 @@ namespace Triopet.Web
 
         [Delete("/deleteimage/{id}")]
         Task<HttpResponseMessage> DeleteImage(int id);
+
+        [Get("/exits")]
+        Task<List<ExitDto>> GetExits();
+
+        [Get("/exits/{id}")]
+        Task<ExitDto> GetExitById(int id);
+
+        [Delete("/exits/{id}")]
+        Task<HttpResponseMessage> DeleteExits(int id);
     }
 }

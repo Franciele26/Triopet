@@ -1,0 +1,97 @@
+﻿@page "/exits/"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+@using MudBlazor
+
+<PageTitle>Exits</PageTitle>
+
+<h1>ExitList</h1>
+
+<div class="exit-list">
+    <MudSnackbarProvider />
+    <MudTable Items="@Exits" Hover="true" Breakpoint="Breakpoint.Md"
+              Loading="@_loading" LoadingProgressColor="Color.Primary">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Date</MudTh>
+            <MudTh>Motif</MudTh>
+            <MudTh>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@OnAddExit">
+                    Add
+                </MudButton>
+            </MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Date">@context.DateOfExit</MudTd>
+            <MudTd DataLabel="Motif">@context.Reason.Reason</MudTd>
+            <MudTd DataLabel="Action">
+                <MudIconButton @onclick="() => OnViewExits(context.Id)"
+                               Variant="Variant.Filled" Icon="@Icons.Material.Outlined.Visibility" Color="Color.Warning"
+                               aria-label="Detail">
+                </MudIconButton>
+                @*<MudIconButton @onclick="() => OnDeleteExit(context)"
+                               Variant="Variant.Filled" Icon="@Icons.Material.Rounded.Delete" Color="Color.Warning"
+                               aria-label="Delete">
+                </MudIconButton>*@
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <h3>@Message</h3>
+
+</div>
+
+@code {
+    private List<ExitDto> Exits { get; set; } = new();
+    private string Message { get; set; } = string.Empty;
+    private bool _loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Snackbar.Clear();
+        _loading = true;
+        try
+        {
+            Exits = (await ApiService.GetExits()).ToList();
+            await Task.Delay(300);
+            _loading = false;
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+
+            Message = "Erro ao tentar procurar lista de saidas";
+        }
+    }
+
+    private void OnAddExit()
+    {
+        Nav.NavigateTo($"/addexit");
+    }
+
+    private void OnViewExits(int id)
+    {
+        Nav.NavigateTo($"/exitsdetails/{id}");
+    }
+
+    //private async Task OnDeleteExit(ExitDto exit)
+    //{
+    //    var responseDelete = await ApiService.DeleteExits(exit.Id);
+    //    if (responseDelete.StatusCode == System.Net.HttpStatusCode.OK)
+    //    {
+    //        Exits = (await ApiService.GetExits()).ToList();
+    //        StateHasChanged();
+    //        Snackbar.Add($"Exit id {exit.Id} was deleted", Severity.Success);
+    //    }
+    //    else
+    //    {
+    //        Snackbar.Add("Error trying to erase exit");
+    //    }
+    //}
+}
