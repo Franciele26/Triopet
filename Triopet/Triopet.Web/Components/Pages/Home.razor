@@ -24,7 +24,8 @@
             <MudCardContent>
               @if (produto.Images != null && produto.Images.Any())
               {
-              <MudImage Src="@produto.Images.First().Url" Alt="@produto.Name" Width="100" Height="100" />
+              <MudImage Src="@produto.Images.First().Url" Alt="@produto.Name" 
+                        ObjectFit="ObjectFit.Cover" Width="100" Height="100" />
               }
 
              <MudText Typography="Typo.h6">@produto.Name</MudText>
