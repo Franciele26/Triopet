@@ -19,10 +19,14 @@
             <MudTh>Date</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudLink @onclick="() => OnViewEntries(context.Id)">
-                <MudTd DataLabel="Id">@context.Id</MudTd>
-                <MudTd DataLabel="Date">@context.DateOfEntry</MudTd>
-            </MudLink>
+            <MudTd DataLabel="Id">@context.Id</MudTd>
+            <MudTd DataLabel="Date">@context.DateOfEntry</MudTd>
+            <MudTd DataLabel="Actions">
+                <MudIconButton @onclick="() => OnViewEntries(context.Id)"
+                               Variant="Variant.Filled" Icon="@Icons.Material.Outlined.Visibility" Color="Color.Warning"
+                               aria-label="Detail">
+				</MudIconButton>
+			</MudTd>
         </RowTemplate>
     </MudTable>
 
@@ -71,7 +75,7 @@
 
     {
 
-        Nav.NavigateTo($"/entrydetails{id}");
+        Nav.NavigateTo($"/entrydetails/{id}");
 
     }
 

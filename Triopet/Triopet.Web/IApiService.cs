@@ -61,9 +61,24 @@ namespace Triopet.Web
         Task<HttpResponseMessage> UpdateExit([Body] ExitDto exit);
         #endregion
 
-
-        [Get("/entries")]
+        #region Entries
+        [Get("/entries/")]
         Task<List<EntryDto>> GetEntries();
+
+        [Get("/entries/{id}")]
+        Task<EntryDto> GetEntryById(int id);
+
+        [Delete("/entries/{id}")]
+        Task<HttpResponseMessage> DeleteEntry(int id);
+
+        [Post("/entries/")]
+        Task<HttpResponseMessage> CreateNewEntry([Body] ExitDto exit);
+
+        [Put("/entries/")]
+        Task<HttpResponseMessage> UpdateEntry([Body] ExitDto exit);
+        #endregion
+
+
 
     }
 }
