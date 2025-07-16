@@ -17,12 +17,22 @@ else
     <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
         <MudPaper Elevation="3" Class="pa-6">
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="my-2">
-                <MudText Typo="Typo.h5" GutterBottom="true">
-                    Saída: <span>@Exit.Id</span>
-                </MudText>
-                <MudText Typo="Typo.h5" GutterBottom="true">
-                    Data: <span>@Exit.DateOfExit</span>
-                </MudText>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        Saída:
+                    </MudText>
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        @Exit.Id
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        Data:
+                    </MudText>
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        @Exit.DateOfExit
+                    </MudText>
+                </MudStack>
             </MudStack>
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="my-2">
                 <MudText Typo="Typo.h5">Motivo:</MudText>
