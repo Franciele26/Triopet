@@ -17,7 +17,7 @@ namespace Triopet.Web
         [Put("/products")]
         Task<HttpResponseMessage> UpdateProduct([Body] ProductDto product);
 
-        [Delete("/products/{id}")]
+        [Put("/products/{id}")]
         Task<HttpResponseMessage> DeleteProduct(int id);
        
         [Get("/categories")]
