@@ -57,5 +57,14 @@ namespace Triopet.Web
         [Put("/exits/")]
         Task<HttpResponseMessage> UpdateExit([Body] ExitDto exit);
         #endregion
+
+
+        [Get("/entries")]
+        Task<List<EntryDto>> GetEntries();
+
+        [Get("/entries/{id}")]
+        Task<List<ProductEntryDto>>GetEntryAsync();
+
+
     }
 }
