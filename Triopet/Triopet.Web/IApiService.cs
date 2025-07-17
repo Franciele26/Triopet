@@ -28,5 +28,25 @@ namespace Triopet.Web
 
         [Get("/products/{id}")]
         Task<ProductDto> GetProductById(int id);
+
+
+        [Get("/reasons")]
+        Task<List<ReasonDto>> GetReasonsAsync();
+
+
+        [Get("/exits/{id}")]
+        Task<ExitDto> GetExitById(int id);
+
+        [Get("/exits")]
+        Task<List<ExitDto>> GetExitsAsync();
+
+        [Post("/exits")]
+        Task<HttpResponseMessage> AddExitAsync([Body] ExitDto exit);
+
+        [Put("/exits")]
+        Task<HttpResponseMessage> UpdateExit([Body] ExitDto exit);
+
+        [Delete("/exits/{id}")]
+        Task<HttpResponseMessage> DeleteExit(int id);
     }
 }
