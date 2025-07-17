@@ -1,0 +1,172 @@
+﻿@* @page "/addentry"
+@page "/editentry/{Id:int}"
+@inject NavigationManager NavigationManager
+@inject IApiService ApiService
+@inject ISnackbar Snackbar
+@using Triopet.Shared.Models
+@rendermode InteractiveServer
+
+<MudSnackbarProvider />
+
+@if (Id > 0)
+{
+    <h3>Edit Entry</h3>
+}
+else
+{
+    <h3>Add Entry</h3>
+}
+
+<EditForm Model="NewEntry" OnValidSubmit="CreateNewEntry">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label>Id:</label>
+        <input type="text" @bind="NewEntry.Id" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Date of Entry:</label>
+        <input type="text" @bind="NewEntry.DateOfEntry" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Categoria:</label>
+        <select class="form-control" @bind="NewProduct.CategoryId">
+            <option value="">Selecione uma categoria</option>
+            @foreach (var cat in Categorias)
+            {
+                <option value="@cat.Id">@cat.Category</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Animal Type:</label>
+        <select class="form-control" @bind="NewProduct.AnimalTypeId">
+            <option value="">Selecione um tipo de animal</option>
+            @foreach (var type in AnimalTypes)
+            {
+                <option value="@type.Id">@type.AnimalType</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Quantidade:</label>
+        <input type="number" @bind="NewProduct.Quantity" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label>Preço:</label>
+        <input type="number" step="0.01" @bind="NewProduct.PricePerUnit" class="form-control" />
+    </div>
+
+    <nav aria-label="Ações" class="mt-3">
+        <button class="btn btn-primary" type="submit">@buttonText</button>
+        <button @onclick="Voltar" type="button" class="btn btn-secondary mt-2 ms-2">Voltar</button>
+    </nav>
+
+    <ValidationSummary />
+</EditForm>
+
+@if (!string.IsNullOrEmpty(Mensagem))
+{
+    <p class="text-success mt-3">@Mensagem</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public string buttonText => Id > 0 ? "Save" : "Add";
+
+
+
+    public EntryDto NewEntry = new();
+    private List<ProductDto> Produto = new();
+
+    private string Mensagem = string.Empty;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Produto = await ApiService.GetProductsAsync();
+
+        if (Id > 0)
+        {
+            var entrada = await ApiService.GetEntryById(Id);
+
+            if (entrada != null)
+            {
+                entrada.ProductEntries.Id = product.AnimalType?.Id ?? 0;
+
+                NewEntry = product;
+                
+
+            }
+        }
+    }
+
+    private async Task CreateNewEntry()
+    {
+        NewEntry.Category = Categorias.FirstOrDefault(c => c.Id == NewProduct.CategoryId) ?? new CategoryDto();
+        NewEntry.AnimalType = AnimalTypes.FirstOrDefault(t => t.Id == NewProduct.AnimalTypeId) ?? new AnimalTypeDto();
+
+        if (Id > 0)
+        {
+            var response = await ApiService.UpdateEntry(NewEntry);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("The entry was updated successfully!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Error, while trying to update an entry", Severity.Success);
+            }
+        }
+        else
+        {
+            var response = await ApiService.CreateNewEntry(NewEntry);
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("The entry was added successfully!", Severity.Success);
+                NewEntry = new EntryDto();
+            }
+            else
+            {
+                Snackbar.Add("Error, while adding a new entry", Severity.Error);
+            }
+        }
+    }
+
+    private void Voltar()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+
+    // private void AdicionarImagem()
+    // {
+    //     if (!string.IsNullOrWhiteSpace(NovaImagemUrl))
+    //     {
+    //         ImagensTemporarias.Add(new ImageDto { Url = NovaImagemUrl });
+    //         NovaImagemUrl = string.Empty;
+    //     }
+    // }
+
+    // private async Task RemoverImagem(ImageDto imagem)
+    // {
+    //     var response = await ApiService.DeleteImage(imagem.Id);
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         ImagensTemporarias.Remove(imagem);
+    //         Snackbar.Add("Imagem removida com sucesso!", Severity.Success);
+    //     }
+    //     else
+    //     {
+    //         Snackbar.Add("Erro ao remover imagem.", Severity.Error);
+    //     }
+    // }
+} *@
