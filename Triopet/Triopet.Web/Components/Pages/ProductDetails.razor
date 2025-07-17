@@ -1,4 +1,5 @@
-﻿@page "/productdetails/{Id:int}"
+﻿
+@page "/productdetails/{Id:int}"
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
 @using Triopet.Shared.Models
@@ -14,10 +15,9 @@ else
 {
     <MudCard Class="p-4 mt-3">
         <MudText><b>Nome:</b> @Produto.Name</MudText>
-@*      <MudText><b>Preço:</b> R$ @Produto.Price</MudText>
         <MudText><b>Categoria ID:</b> @Produto.CategoryId</MudText>
         <MudText><b>Tipo de Animal:</b> @Produto.AnimalTypeId</MudText>
- *@        <MudText><b>Descrição:</b> @Produto.Description</MudText>
+        <MudText><b>Descrição:</b> @Produto.Description</MudText>
         <MudText><b>Quantidade:</b> @Produto.Quantity</MudText>
 
         <div class="mt-4">
@@ -39,7 +39,6 @@ else
 
     private ProductDto Produto;
     private string Mensagem = string.Empty;
-    
     protected override async Task OnInitializedAsync()
     {
         try
@@ -61,10 +60,17 @@ else
     {
         try
         {
-            await ApiService.DeleteProduct(Id);
-            Mensagem = "Produto excluído com sucesso!";
-            await Task.Delay(1000);
-            NavigationManager.NavigateTo("/");
+            var response = await ApiService.DeleteProduct(Id);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Mensagem = "Produto excluído com sucesso!";
+                StateHasChanged();
+                NavigationManager.NavigateTo("/");
+            }
+            else
+            {
+                Mensagem = "Erro ao apagar!";
+            }
         }
         catch
         {

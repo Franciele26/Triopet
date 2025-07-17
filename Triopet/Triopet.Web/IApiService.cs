@@ -22,13 +22,16 @@ namespace Triopet.Web
         [Put("/products")]
         Task<HttpResponseMessage> UpdateProduct([Body] ProductDto product);
 
-        [Delete("/products/{id}")]
+        [Put("/products/{id}")]
         Task<HttpResponseMessage> DeleteProduct(int id);
         #endregion
 
         #region Categories
         [Get("/categories")]
         Task<List<CategoryDto>> GetCategoriesAsync();
+
+        [Get("/motive")]
+        Task<List<ReasonDto>> GetReasonsAsync();
         #endregion
 
         #region Animal Type
@@ -57,5 +60,10 @@ namespace Triopet.Web
         [Put("/exits/")]
         Task<HttpResponseMessage> UpdateExit([Body] ExitDto exit);
         #endregion
+
+
+        [Get("/entries")]
+        Task<List<EntryDto>> GetEntries();
+
     }
 }
