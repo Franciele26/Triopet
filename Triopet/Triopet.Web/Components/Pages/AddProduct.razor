@@ -76,20 +76,24 @@ else
 
     <ValidationSummary />
 </EditForm>
-
-@if (ImagensTemporarias.Count > 0)
-{
-    <div class="mt-3">
-        <h5>Imagens adicionadas:</h5>
-        <ul>
-            @foreach (var img in ImagensTemporarias)
-            {
-                <li>@img.Url</li>
-            }
-        </ul>
-    </div>
-}
-
+<div>
+    @if (ImagensTemporarias.Count > 0)
+    {
+        <div class="mt-3">
+            <h5>Imagens adicionadas:</h5>
+            <ul>
+                @foreach (var img in ImagensTemporarias)
+                {
+                    <li>
+                        @img.Url
+                        <button class="btn btn-danger btn-sm ms-2" @onclick="() => RemoverImagem(img)">Remover</button>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    <h6>Impossivel de remover, se houver uma unica imagem, em caso de erro. Acrescenta uma nova imagem e remove a errada</h6>
+</div>
 @if (!string.IsNullOrEmpty(Mensagem))
 {
     <p class="text-success mt-3">@Mensagem</p>
@@ -97,34 +101,18 @@ else
 
 @code {
     [Parameter]
-    public int Id { get; set; }
+    public int? Id { get; set; }
+    // [Inject]
+    // public IApiService ApiService { get; set; }
 
-    public string buttonText => Id > 0 ? "Save" : "Add";
-
-    private List<CategoryDto> Categorias = new();
-    private List<AnimalTypeDto> AnimalTypes = new();
-
-    private List<ImageDto> ImagensTemporarias = new();
-
-    public ProductDto NewProduct = new();
+    public Product NewProduct = new();
     private string Mensagem = string.Empty;
     private string NovaImagemUrl;
 
-
-    protected override async Task OnInitializedAsync()
+    private void SalvarProduto()
     {
-        await base.OnInitializedAsync();
-        Categorias = await ApiService.GetCategoriesAsync();
-        AnimalTypes = await ApiService.GetAnimalTypesAsync();
-
-        if (Id > 0)
-        {
-            var product = await ApiService.GetProductById(Id);
-            if (product != null)
-            {
-                NewProduct = product;
-            }
-        }
+        Mensagem = $"Produto '{NewProduct.Name}' cadastrado com sucesso!";
+        NewProduct = new Product();
     }
 
     private async Task OnAddProduct()
@@ -176,3 +164,4 @@ else
         }
     }
 }
+

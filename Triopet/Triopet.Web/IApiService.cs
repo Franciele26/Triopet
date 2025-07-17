@@ -1,4 +1,5 @@
-﻿using Refit;
+﻿using Microsoft.AspNetCore.Mvc;
+using Refit;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -8,8 +9,12 @@ namespace Triopet.Web
 {
     public interface IApiService
     {
+        #region Product
         [Get("/products")]
         Task<List<ProductDto>> GetProductsAsync();
+
+        [Get("/products/{id}")]
+        Task<ProductDto> GetProductById(int id);
 
         [Post("/products")]
         Task<HttpResponseMessage> AddProductAsync([Body] ProductDto product);
@@ -19,34 +24,45 @@ namespace Triopet.Web
 
         [Put("/products/{id}")]
         Task<HttpResponseMessage> DeleteProduct(int id);
-       
+        #endregion
+
+        #region Categories
         [Get("/categories")]
         Task<List<CategoryDto>> GetCategoriesAsync();
+        #endregion
 
+        #region Animal Type
         [Get("/animaltype")]
         Task<List<AnimalTypeDto>> GetAnimalTypesAsync();
+        #endregion
 
-        [Get("/products/{id}")]
-        Task<ProductDto> GetProductById(int id);
+        #region Images
+        [Delete("/deleteimage/{id}")]
+        Task<HttpResponseMessage> DeleteImage(int id);
+        #endregion
 
-
-        [Get("/reasons")]
-        Task<List<ReasonDto>> GetReasonsAsync();
-
+        #region Exits
+        [Get("/exits")]
+        Task<List<ExitDto>> GetExits();
 
         [Get("/exits/{id}")]
         Task<ExitDto> GetExitById(int id);
 
-        [Get("/exits")]
-        Task<List<ExitDto>> GetExitsAsync();
-
-        [Post("/exits")]
-        Task<HttpResponseMessage> AddExitAsync([Body] ExitDto exit);
-
-        [Put("/exits")]
-        Task<HttpResponseMessage> UpdateExit([Body] ExitDto exit);
-
         [Delete("/exits/{id}")]
-        Task<HttpResponseMessage> DeleteExit(int id);
+        Task<HttpResponseMessage> DeleteExits(int id);
+
+        [Post("/exits/")]
+        Task<HttpResponseMessage> CreateNewExit([Body] ExitDto exit);
+
+        [Put("/exits/")]
+        Task<HttpResponseMessage> UpdateExit([Body] ExitDto exit);
+        #endregion
+
+
+        [Get("/entries")]
+        Task<List<EntryDto>> GetEntries();
+
+        [Get("/products/{id}")]
+        Task<ProductDto> GetProductById(int id);
     }
 }
