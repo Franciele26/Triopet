@@ -1,0 +1,127 @@
+﻿@page "/addexit"
+@page "/editexit/{Id:int}"
+@inject NavigationManager NavigationManager
+@inject IApiService ApiService
+@inject ISnackbar Snackbar
+@using Triopet.Shared.Models
+@rendermode InteractiveServer
+
+<MudSnackbarProvider />
+
+@if (Id > 0)
+{
+    <h3>Edit Exit</h3>
+}
+else
+{
+    <h3>Add Exit</h3>
+}
+
+<EditForm Model="NewExit" OnValidSubmit="OnAddExit">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label>Motivo (Reason):</label>
+        <select class="form-control" @bind="NewExit.ReasonId">
+            <option value="">Selecione um motivo</option>
+            @foreach (var reason in Reasons)
+            {
+                <option value="@reason.Id">@reason.Reason</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Produto:</label>
+        <select class="form-control" @bind="NewExit.ProductExitDtos[0].ProductId">
+            <option value="">Selecione um produto</option>
+            @foreach (var prod in Products)
+            {
+                <option value="@prod.Id">@prod.Name</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Quantidade:</label>
+        <input type="number" @bind="NewExit.ProductExitDtos[0].Quantity" class="form-control" />
+    </div>
+
+@*     Rever acima quantidade
+ *@
+    <nav class="mt-3">
+        <button class="btn btn-primary" type="submit">@buttonText</button>
+        <button @onclick="Voltar" type="button" class="btn btn-secondary mt-2 ms-2">Voltar</button>
+    </nav>
+
+    <ValidationSummary />
+</EditForm>
+
+@if (!string.IsNullOrEmpty(Mensagem))
+{
+    <p class="text-success mt-3">@Mensagem</p>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    public string buttonText => Id > 0 ? "Save" : "Add";
+
+    private List<ReasonDto> Reasons = new();
+    private List<ProductDto> Products = new();
+
+    public ExitDto NewExit = new();
+    private string Mensagem = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Reasons = await ApiService.GetReasonsAsync();
+        Products = await ApiService.GetProductsAsync();
+
+        if (Id > 0)
+        {
+            var exit = await ApiService.GetExitById(Id);
+            if (exit != null)
+            {
+                NewExit = exit;
+            }
+        }
+    }
+
+    private async Task OnAddExit()
+    {
+        if (Id > 0)
+        {
+            var response = await ApiService.UpdateExit(NewExit);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Saída atualizada com sucesso!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Erro ao atualizar saída", Severity.Error);
+            }
+        }
+        else
+        {
+            var response = await ApiService.CreateNewExit(NewExit);
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Saída registrada com sucesso!", Severity.Success);
+                NewExit = new ExitDto();
+            }
+            else
+            {
+                Snackbar.Add("Erro ao registrar saída", Severity.Error);
+            }
+        }
+    }
+
+    private void Voltar()
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
