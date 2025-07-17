@@ -33,7 +33,7 @@ else
 
     <div class="form-group">
         <label>Produto:</label>
-        <select class="form-control" @bind="NewExit.ProductExitDtos">
+        <select class="form-control" @bind="NewExit.ProductExitDtos[0].ProductId">
             <option value="">Selecione um produto</option>
             @foreach (var prod in Products)
             {
@@ -44,7 +44,7 @@ else
 
     <div class="form-group">
         <label>Quantidade:</label>
-        <input type="number" @bind="NewExit.ProductExitDtos" class="form-control" />
+        <input type="number" @bind="NewExit.ProductExitDtos[0].Quantity" class="form-control" />
     </div>
 
 @*     Rever acima quantidade
@@ -107,7 +107,7 @@ else
         }
         else
         {
-            var response = await ApiService.AddExitAsync(NewExit);
+            var response = await ApiService.CreateNewExit(NewExit);
             if (response.IsSuccessStatusCode)
             {
                 Snackbar.Add("Saída registrada com sucesso!", Severity.Success);

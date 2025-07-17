@@ -101,18 +101,41 @@ else
 
 @code {
     [Parameter]
-    public int? Id { get; set; }
-    // [Inject]
-    // public IApiService ApiService { get; set; }
+    public int Id { get; set; }
 
-    public Product NewProduct = new();
+    public string buttonText => Id > 0 ? "Save" : "Add";
+
+    private List<CategoryDto> Categorias = new();
+    private List<AnimalTypeDto> AnimalTypes = new();
+
+    private List<ImageDto> ImagensTemporarias = new();
+
+    public ProductDto NewProduct = new();
+
     private string Mensagem = string.Empty;
     private string NovaImagemUrl;
 
-    private void SalvarProduto()
+
+    protected override async Task OnInitializedAsync()
     {
-        Mensagem = $"Produto '{NewProduct.Name}' cadastrado com sucesso!";
-        NewProduct = new Product();
+        await base.OnInitializedAsync();
+        Categorias = await ApiService.GetCategoriesAsync();
+        AnimalTypes = await ApiService.GetAnimalTypesAsync();
+
+        if (Id > 0)
+        {
+            var product = await ApiService.GetProductById(Id);
+
+            if (product != null)
+            {
+                product.CategoryId = product.Category?.Id ?? 0;
+                product.AnimalTypeId = product.AnimalType?.Id ?? 0;
+
+                NewProduct = product;
+                ImagensTemporarias = product.Images;
+
+            }
+        }
     }
 
     private async Task OnAddProduct()
@@ -163,5 +186,18 @@ else
             NovaImagemUrl = string.Empty;
         }
     }
-}
 
+    private async Task RemoverImagem(ImageDto imagem)
+    {
+        var response = await ApiService.DeleteImage(imagem.Id);
+        if (response.IsSuccessStatusCode)
+        {
+            ImagensTemporarias.Remove(imagem);
+            Snackbar.Add("Imagem removida com sucesso!", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Erro ao remover imagem.", Severity.Error);
+        }
+    }
+}

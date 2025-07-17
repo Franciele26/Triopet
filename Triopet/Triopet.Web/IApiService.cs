@@ -29,6 +29,9 @@ namespace Triopet.Web
         #region Categories
         [Get("/categories")]
         Task<List<CategoryDto>> GetCategoriesAsync();
+
+        [Get("/motive")]
+        Task<List<ReasonDto>> GetReasonsAsync();
         #endregion
 
         #region Animal Type
@@ -62,7 +65,5 @@ namespace Triopet.Web
         [Get("/entries")]
         Task<List<EntryDto>> GetEntries();
 
-        [Get("/products/{id}")]
-        Task<ProductDto> GetProductById(int id);
     }
 }
