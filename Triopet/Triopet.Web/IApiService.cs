@@ -72,10 +72,10 @@ namespace Triopet.Web
         Task<HttpResponseMessage> DeleteEntry(int id);
 
         [Post("/entries/")]
-        Task<HttpResponseMessage> CreateNewEntry([Body] ExitDto exit);
+        Task<HttpResponseMessage> CreateNewEntry([Body] EntryDto entry);
 
         [Put("/entries/")]
-        Task<HttpResponseMessage> UpdateEntry([Body] ExitDto exit);
+        Task<HttpResponseMessage> UpdateEntry([Body] EntryDto entry);
         #endregion
 
 
