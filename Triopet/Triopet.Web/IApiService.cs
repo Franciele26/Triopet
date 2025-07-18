@@ -30,7 +30,7 @@ namespace Triopet.Web
         [Get("/categories")]
         Task<List<CategoryDto>> GetCategoriesAsync();
 
-        [Get("/motive")]
+        [Get("/motives")]
         Task<List<ReasonDto>> GetReasonsAsync();
         #endregion
 
