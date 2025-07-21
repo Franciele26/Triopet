@@ -171,23 +171,6 @@ namespace Triopet.Api.Controllers
             return Ok(productsByCategory);
         }
 
-        [HttpGet("/valueInStock")]
-        public async Task<IActionResult> ValueInStock()
-        {
-            //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
-            var valuesInStockPerCat = await _businessContext.Products
-                .Include(c => c.Category)
-                .GroupBy(g => new { g.CategoryId, g.Category.CategoryName })
-                .Select(vsc => new CategoryPricesDto
-                {
-                    CategoryId = vsc.Key.CategoryId,
-                    CategoryName = vsc.Key.CategoryName,
-                    Price = vsc.Sum(p => p.Price * p.Quantity)
-                }).ToListAsync();
-
-            return Ok(valuesInStockPerCat);
-        }
-
         //nome -> stock -> valor do stock // para orders -> tambem preciso de categoria e tipo de animal
         [HttpGet("/stockValueQuantity")]
         public async Task<IActionResult> StockValueAndQuantity()
@@ -215,6 +198,23 @@ namespace Triopet.Api.Controllers
                 }).ToListAsync();
 
             return Ok(productsStockAndTotal);
+        }
+        //editar para adicionar tambem o valor total
+        [HttpGet("/valueInStock")]
+        public async Task<IActionResult> ValueInStock()
+        {
+            //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
+            var valuesInStockPerCat = await _businessContext.Products
+                .Include(c => c.Category)
+                .GroupBy(g => new { g.CategoryId, g.Category.CategoryName })
+                .Select(vsc => new CategoryPricesDto
+                {
+                    CategoryId = vsc.Key.CategoryId,
+                    CategoryName = vsc.Key.CategoryName,
+                    Price = vsc.Sum(p => p.Price * p.Quantity)
+                }).ToListAsync();
+
+            return Ok(valuesInStockPerCat);
         }
     }
 }
