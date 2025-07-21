@@ -221,6 +221,19 @@ namespace Triopet.Api.Controllers
                 }
             }
 
+            foreach (var pe in exitDto.ProductExitDtos)
+            {
+                var prod = await _businessContext.Products.FindAsync(pe.ProductId);
+                if (prod == null)
+                    return NotFound($"Product {pe.ProductId} not found");
+
+                if (pe.Quantity < 0)
+                    return BadRequest($"Invalid quantity for product '{prod.Name}'.");
+
+                if (prod.Quantity < pe.Quantity)
+                    return BadRequest($"Stock too low for product '{prod.Name}'. Available: {prod.Quantity}, requested: {pe.Quantity}");
+            }
+
             //atualizar os dados
             existingExitLog.ExitDate = exitDto.DateOfExit;
             existingExitLog.MotifId = exitDto.ReasonId;
@@ -229,19 +242,19 @@ namespace Triopet.Api.Controllers
             //apagar a lista atual
             existingExitLog.ProductExits.Clear();
 
-            //a dicionar os novos ProductExits e subtrair stock dos produtos
+            //adicionar os novos ProductExits e subtrair stock dos produtos
             foreach (var pe in exitDto.ProductExitDtos)
             {
                 var prod = await _businessContext.Products.FindAsync(pe.ProductId);
-                if (prod == null)
-                {
-                    return NotFound($"Product {pe.ProductId} not found");
-                }
+                //if (prod == null)
+                //{
+                //    return NotFound($"Product {pe.ProductId} not found");
+                //}
 
-                if (pe.Quantity < 0 && prod.Quantity < pe.Quantity)
-                {
-                    return BadRequest($"Error while editing stock for product '{prod.Name}'.");
-                }
+                //if (pe.Quantity < 0 || prod.Quantity < pe.Quantity)
+                //{
+                //    return BadRequest($"Error while editing stock for product '{prod.Name}'.");
+                //}
 
                 prod.Quantity -= pe.Quantity;
 

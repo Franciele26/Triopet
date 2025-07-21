@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Triopet.Shared.Models.DashBoardDtos
 {
-    public class TopProductsSoldPerCategory
+    public class TopProductsSoldPerCategoryDto
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
