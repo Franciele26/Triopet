@@ -156,7 +156,7 @@ namespace Triopet.Api.Controllers
 
             var newExit = new Exit
             {
-                ExitDate = DateTime.UtcNow,
+                ExitDate = exitDto.DateOfExit,
                 MotifId = exitDto.ReasonId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
