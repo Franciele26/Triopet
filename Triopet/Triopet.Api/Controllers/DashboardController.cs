@@ -148,5 +148,7 @@ namespace Triopet.Api.Controllers
                 return BadRequest($"Error trying to get the top 3 for category {categoryId}: {ex.Message}");
             }
         }
+
+
     }
 }
