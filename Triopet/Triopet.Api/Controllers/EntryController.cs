@@ -168,7 +168,7 @@ namespace Triopet.Api.Controllers
                 {
                     ProductId = pe.ProductId,
                     Quantity = pe.Quantity,
-                    PriceUnit = pe.PriceUnitOfEntry
+                    PriceUnit= pe.PriceUnitOfEntry
                 });
             }
             _businessContext.Entries.Add(newEntry);
