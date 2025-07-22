@@ -76,6 +76,7 @@ namespace Triopet.Web
 
         [Put("/entries/")]
         Task<HttpResponseMessage> UpdateEntry([Body] EntryDto entry);
+
         #endregion
 
 
