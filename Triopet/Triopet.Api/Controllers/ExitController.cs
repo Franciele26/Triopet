@@ -221,6 +221,7 @@ namespace Triopet.Api.Controllers
                 }
             }
 
+
             foreach (var pe in exitDto.ProductExitDtos)
             {
                 var prod = await _businessContext.Products.FindAsync(pe.ProductId);
@@ -233,8 +234,10 @@ namespace Triopet.Api.Controllers
                 if (prod.Quantity < pe.Quantity)
                     return BadRequest($"Stock too low for product '{prod.Name}'. Available: {prod.Quantity}, requested: {pe.Quantity}");
             }
+        
 
             //atualizar os dados
+
             existingExitLog.ExitDate = exitDto.DateOfExit;
             existingExitLog.MotifId = exitDto.ReasonId;
             existingExitLog.UpdatedAt = DateTime.UtcNow;
