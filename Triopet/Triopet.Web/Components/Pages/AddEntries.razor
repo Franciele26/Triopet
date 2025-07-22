@@ -58,6 +58,7 @@ else
                 var productName = Products.FirstOrDefault(x => x.Id == p.ProductId)?.Name ?? "Desconhecido";
                 <li>
                     @productName - Quantidade: @p.Quantity
+                    @productName - Preço: @p.PriceUnitOfEntry
                     <button class="btn btn-sm btn-danger ms-2" @onclick="() => RemoveProduct(p)">Remover</button>
                 </li>
             }
@@ -142,20 +143,22 @@ else
 
     private void AddProductToList()
     {
-        if (List.ProductId > 0 && List.Quantity > 0)
+        if (List.ProductId > 0 || List.Quantity > 0 || List.PriceUnitOfEntry>0)
         {
             // Evitar duplicados
             var existing = NewEntry.ProductEntries.FirstOrDefault(x => x.ProductId == List.ProductId);
             if (existing != null)
             {
                 existing.Quantity += List.Quantity;
+                existing.PriceUnitOfEntry = List.PriceUnitOfEntry;
             }
             else
             {
                 NewEntry.ProductEntries.Add(new ProductEntryDto
                 {
                     ProductId = List.ProductId,
-                    Quantity = List.Quantity
+                    Quantity = List.Quantity,
+                    PriceUnitOfEntry = List.PriceUnitOfEntry
                 });
             }
 
