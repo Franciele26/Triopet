@@ -93,11 +93,6 @@ else
     private List<ReasonDto> Reasons = new();
     private List<ProductDto> Products = new();
 
-    private void EditarProduto()
-    {
-        NavigationManager.NavigateTo($"/editproduct/{Id}");
-    }
-
     private ProductExitDto List = new();
 
     private ExitDto NewExit = new();
@@ -120,6 +115,11 @@ else
         }
     }
 
+    private void EditarProduto()
+    {
+        NavigationManager.NavigateTo($"/editproduct/{Id}");
+    }
+      
     private void RemoveProduct(ProductExitDto item)
     {
         NewExit.ProductExitDtos.Remove(item);
