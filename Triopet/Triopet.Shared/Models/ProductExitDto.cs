@@ -9,6 +9,7 @@ namespace Triopet.Shared.Models
     public class ProductExitDto
     {
         public int ProductId { get; set; }
+        public DateTime ExitDate { get; set; } = DateTime.Now;
         public int ExitId { get; set; }
         public int Quantity { get; set; }
         public ProductDto? Product { get; set; } 
