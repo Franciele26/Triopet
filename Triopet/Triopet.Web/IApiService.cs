@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Triopet.Shared.Models;
+using Triopet.Shared.Models.DashBoardDtos;
 
 namespace Triopet.Web
 {
@@ -79,7 +80,17 @@ namespace Triopet.Web
 
         #endregion
 
+        #region Dashboard
+        [Get("/lowstock/")]
+        Task<List<LowStockProductsDto>> GetLowStockProducts();
 
+        [Get("/topSoldItems/{categoryId}")]
+        Task<List<TopProductsSoldPerCategoryDto>> GetTopSoldProducts(int categoryId);
+
+        [Get("/topfivemovements/")]
+        Task<List<TopFiveMovementDto>> GetTopFiveMovements();
+
+        #endregion
 
     }
 }

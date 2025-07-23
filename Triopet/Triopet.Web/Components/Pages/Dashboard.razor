@@ -1,0 +1,186 @@
+﻿@page "/dashboard"
+@inject IApiService ApiService
+@using Triopet.Shared.Models
+@using Triopet.Shared.Models.DashBoardDtos
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard</PageTitle>
+<div class="page">
+    <MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center">
+        Dashboard
+    </MudText>
+    @*Placement for lowstock prodcuts*@
+    <MudContainer>
+        <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
+            Low Stock!!
+        </MudText>
+        <MudTable Items="@LowStockProducts" Hover="true" Breakpoint="Breakpoint.Md"
+                  Loading="@_loading" LoadingProgressColor="Color.Primary">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Category</MudTh>
+                <MudTh>Animal Type</MudTh>
+                <MudTh>Quantity</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Category">@context.Category.Category</MudTd>
+                <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
+                <MudTd DataLabel="Quantity">@context.QUantity</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudContainer>
+
+    @*Placement for topSoldItems top 3,bar chart*@
+    <MudContainer Class="mt-4 mb-4">
+        <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
+            Top Sold Items per Category
+        </MudText>
+        @if (Categories.Count <= 0)
+        {
+            <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
+                Error trying to get categories
+            </MudText>
+        }
+        else
+        {
+            <MudStack Row="false" Class="gap-2">
+                <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
+                    <option value="0">Select a category</option>
+                    @foreach (var item in Categories)
+                    {
+                        <option value="@item.Id">@item.Category</option>
+                    }
+                </select>
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                    <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
+                              XAxisLabels="@_xAxisLabels"
+                              Width="90%" Height="50vh" />
+                </div>
+            </MudStack>
+        }
+    </MudContainer>
+    @*Placement for top 5 movements*@
+    <MudContainer>
+        <MudText Class="topFiveMovements" Typo="Typo.h5" GutterBottom="true">
+            Top Five Movements
+        </MudText>
+        <MudTable Items="@TopFiveMovemens" Hover="true" Breakpoint="Breakpoint.Md"
+                  Loading="@_loading" LoadingProgressColor="Color.Primary">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Category</MudTh>
+                <MudTh>Animal Type</MudTh>
+                <MudTh>Total de Movimentos</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Category">@context.Category.Category</MudTd>
+                <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
+                <MudTd DataLabel="Quantity">@context.TotalMovements</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudContainer>
+    @*Testar componente
+    <MudContainer>
+        <EntriesHome />
+        <ExitList />
+    </MudContainer>*@
+</div>
+
+@code
+{
+    //main lists
+    private List<LowStockProductsDto> LowStockProducts = new();
+    private List<TopProductsSoldPerCategoryDto> TopSoldItems = new();
+    private List<CategoryDto> Categories = new();
+    private List<ChartSeries> chatSeries = new();
+    private List<TopFiveMovementDto> TopFiveMovemens = new();
+
+    //campos para o topsolds
+    private int _index = -1;
+    private string[] _xAxisLabels;
+
+    //Serve para ir buscar e trocar a categoria em maneira responsiva
+    private int selectedCategory;
+    private int SelectedCategory
+    {
+        get => selectedCategory;
+        set
+        {
+            if (selectedCategory != value)
+            {
+                selectedCategory = value;
+                _ = LoadTopSoldItems(selectedCategory);
+            }
+        }
+    }
+
+    //campos extra
+    private bool _loading = false;
+    private string Message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        try
+        {
+            await base.OnInitializedAsync();
+            LowStockProducts = await ApiService.GetLowStockProducts();
+            Categories = await ApiService.GetCategoriesAsync();
+            TopFiveMovemens = await ApiService.GetTopFiveMovements();
+
+            if (Categories.Any())
+            {
+                SelectedCategory = Categories.First().Id;
+                await LoadTopSoldItems(SelectedCategory);
+            }
+
+            _loading = false;
+        }
+        catch (Exception)
+        {
+
+            Message = "Erro a receber os dados da base de dados";
+        }
+    }
+    private async Task OnCategoryChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int categoryId))
+        {
+            SelectedCategory = categoryId;
+            await LoadTopSoldItems(SelectedCategory);
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadTopSoldItems(int categoryId)
+    {
+
+        var topSold = await ApiService.GetTopSoldProducts(categoryId);
+
+        if (topSold != null && topSold.Any())
+        {
+            chatSeries = new List<ChartSeries>
+{
+            new ChartSeries
+            {
+                Name = "Quantidade vendida",
+                Data = topSold.Select(x => (double)x.SoldQuantity).ToArray()
+            }
+        };
+            _xAxisLabels = topSold.Select(x => x.Name).ToArray();
+        }
+        else
+        {
+            chatSeries = new List<ChartSeries>();
+            _xAxisLabels = Array.Empty<string>();
+        }
+    }
+
+
+}

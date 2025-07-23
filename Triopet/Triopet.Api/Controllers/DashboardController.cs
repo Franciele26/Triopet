@@ -106,50 +106,41 @@ namespace Triopet.Api.Controllers
         public async Task<IActionResult> TopSoldItems(int categoryId)//3 tabelas - charts, em baixo, cada barra é uma categoria,
                                                                      //de lado fica o SoldQuantity
         {
-            try
+            //Fazer para receber o categoryId apartir do frontend
+            //Venda - motif - sales
+            var productsByCategory = await _businessContext.Products
+            .Include(pe => pe.ProductExits)
+                .ThenInclude(e => e.Exit)
+                    .ThenInclude(m => m.Motif)
+            .Where(p => !p.IsDeleted && p.CategoryId == categoryId)
+            .ToListAsync();
+
+            var topSalesList = new List<TopProductsSoldPerCategoryDto>();
+
+            foreach (var item in productsByCategory)
             {
-                //Fazer para receber o categoryId apartir do frontend
-                //Venda - motif - sales
-                var productsByCategory = await _businessContext.Products
-                .Include(pe => pe.ProductExits)
-                    .ThenInclude(e => e.Exit)
-                        .ThenInclude(m => m.Motif)
-                .Where(p => !p.IsDeleted && p.CategoryId == categoryId)
-                .ToListAsync();
+                //ir buscar os produtos do fetch anterior, os produtos que for de reason Vedas e sumar a quantidade nas saidas
+                //para demonstrar numero produtos vendidos
+                var totalSold = item.ProductExits
+                    .Where(pe => pe.Exit.Motif.Reason == "Venda" || pe.Exit.Motif.Reason == "Sales")
+                    .Sum(pe => pe.Quantity);
 
-                var topSalesList = new List<TopProductsSoldPerCategoryDto>();
-
-                foreach (var item in productsByCategory)
+                //se houver vendas, converter para dto
+                topSalesList.Add(new TopProductsSoldPerCategoryDto
                 {
-                    //ir buscar os produtos do fetch anterior, os produtos que for de reason Vedas e sumar a quantidade nas saidas
-                    //para demonstrar numero produtos vendidos
-                    var totalSold = item.ProductExits
-                        .Where(pe => pe.Exit.Motif.Reason == "Venda" || pe.Exit.Motif.Reason == "Sales")
-                        .Sum(pe => pe.Quantity);
-
-                    //se houver vendas, converter para dto
-                    if (totalSold > 0)
-                    {
-                        topSalesList.Add(new TopProductsSoldPerCategoryDto
-                        {
-                            Id = item.Id,
-                            Name = item.Name,
-                            SoldQuantity = totalSold,
-                        });
-                    }
-                }
-                //ir buscar SO o top 3 dessa lista
-                var topThree = topSalesList.OrderByDescending(s => s.SoldQuantity)
-                    .Take(3).ToList();
-
-
-                return Ok(topThree);
+                    Id = item.Id,
+                    Name = item.Name,
+                    SoldQuantity = totalSold,
+                });
             }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error trying to get the top 3 for category {categoryId}: {ex.Message}");
-            }
+            //ir buscar SO o top 3 dessa lista
+            var topThree = topSalesList.OrderByDescending(s => s.SoldQuantity)
+                .Take(3).ToList();
+
+
+            return Ok(topThree);
         }
+        
 
         //usar CategoryPrices para quando for so preciso os campos das categorias + preço
 
