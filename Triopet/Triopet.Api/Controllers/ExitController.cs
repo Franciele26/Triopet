@@ -245,7 +245,7 @@ namespace Triopet.Api.Controllers
             //apagar a lista atual
             existingExitLog.ProductExits.Clear();
 
-            //a dicionar os novos ProductExits e subtrair stock dos produtos
+            //adicionar os novos ProductExits e subtrair stock dos produtos
             foreach (var pe in exitDto.ProductExitDtos)
             {
                 var prod = await _businessContext.Products.FindAsync(pe.ProductId);
