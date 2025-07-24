@@ -272,12 +272,16 @@ namespace Triopet.Api.Controllers
                 if (pe.Quantity < 0)
                     return BadRequest($"Impossible to add negative numbers to stock for product '{prod.Name}'.");
 
+                if (pe.PriceUnitOfEntry < 0)
+                    return BadRequest($"Impossible to add negative numbers to stock for product '{prod.Name}'.");
+
                 prod.Quantity += pe.Quantity;
 
                 existingEntryLog.ProductEntries.Add(new ProductEntry
                 {
                     ProductId = pe.ProductId,
-                    Quantity = pe.Quantity
+                    Quantity = pe.Quantity,
+                    PriceUnit=pe.PriceUnitOfEntry
                 });
             }
 
