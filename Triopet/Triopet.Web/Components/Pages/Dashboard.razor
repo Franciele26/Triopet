@@ -9,12 +9,30 @@
     <MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center">
         Dashboard
     </MudText>
+
+    @*Zona para os cards, ascrecentar uns para total de entradas e total de saidas*@
+    <MudGrid Class="mt-5" Style="margin-bottom:5vh;">
+        <MudItem xs="12" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6">Total Stock Value</MudText>
+                <MudText Typo="Typo.h5">@TotalStockValue.ToString("C")</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6">Low Stock Products</MudText>
+                <MudText Typo="Typo.h5">@LowStockProducts.Count</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
     @*Placement for lowstock prodcuts*@
-    <MudContainer>
+    <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
         <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
             Low Stock!!
         </MudText>
-        <MudTable Items="@LowStockProducts" Hover="true" Breakpoint="Breakpoint.Md"
+        <MudTable Class="mt-5"
+                  Items="@LowStockProducts" Hover="true" Breakpoint="Breakpoint.Md"
                   Loading="@_loading" LoadingProgressColor="Color.Primary">
             <HeaderContent>
                 <MudTh>Id</MudTh>
@@ -34,11 +52,12 @@
     </MudContainer>
 
     @*Placement for top 5 movements*@
-    <MudContainer>
+    <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
         <MudText Class="topFiveMovements" Typo="Typo.h5" GutterBottom="true">
             Top Five Movements
         </MudText>
-        <MudTable Items="@TopFiveMovemens" Hover="true" Breakpoint="Breakpoint.Md"
+        <MudTable Class="mt-5"
+                  Items="@TopFiveMovemens" Hover="true" Breakpoint="Breakpoint.Md"
                   Loading="@_loading" LoadingProgressColor="Color.Primary">
             <HeaderContent>
                 <MudTh>Id</MudTh>
@@ -57,19 +76,19 @@
         </MudTable>
     </MudContainer>
     @*Placement for topSoldItems top 3,bar chart*@
-    <MudContainer Class="mt-4 mb-4">
+    <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
         <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
             Top Sold Items per Category
         </MudText>
         @if (Categories.Count <= 0)
         {
-            <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
+            <MudText Class="lowStock-container mt-5" Typo="Typo.h4" GutterBottom="true">
                 Error trying to get categories
             </MudText>
         }
         else
         {
-            <MudStack Row="false" Class="gap-2">
+            <MudStack Row="false" Class="mt-5">
                 <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
                     <option value="0">Select a category</option>
                     @foreach (var item in Categories)
@@ -93,8 +112,8 @@
         </MudContainer>*@
 
     @*Placement converter este para pie chart -> Dto a usar -> CategoryPricesDto mas usar o controlador que devolve a media*@
-    <MudContainer>
-        <MudText Class="CategoryPricesTitle" Typo="Typo.h4" GutterBottom="true">
+    <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+        <MudText Class="CategoryPricesTitle mt-5" Typo="Typo.h4" GutterBottom="true">
             Category Value in Stock
         </MudText>
         <MudGrid>
@@ -119,8 +138,7 @@
                     <MudChart ChartType="ChartType.Pie"
                               InputData="@PieData"
                               InputLabels="@PieLabels"
-                              Width="500px" Height="400px" 
-                              />
+                              Width="500px" Height="400px" />
                 </MudPaper>
             </MudItem>
         </MudGrid>
