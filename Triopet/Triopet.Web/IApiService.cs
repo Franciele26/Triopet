@@ -92,6 +92,9 @@ namespace Triopet.Web
 
         [Get("/valueInStock/")]
         Task<List<CategoryPricesDto>> GetValueInStock();
+
+        [Get("/stockValueQuantity/")]
+        Task<List<ProductStockQuantityPerCategoryDto>> GetStockValueQuantity();
         #endregion
 
     }

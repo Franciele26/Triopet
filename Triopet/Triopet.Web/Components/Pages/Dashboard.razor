@@ -11,7 +11,7 @@
     </MudText>
 
     @*Zona para os cards, ascrecentar uns para total de entradas e total de saidas*@
-    <MudGrid Class="mt-5" Style="margin-bottom:5vh;">
+    <MudGrid Class="mt-5" Style="margin-bottom:5vh;" Justify="Justify.Center" Spacing="10">
         <MudItem xs="12" md="3">
             <MudPaper Class="pa-4" Elevation="2">
                 <MudText Typo="Typo.h6">Total Stock Value</MudText>
@@ -161,8 +161,11 @@
     private List<ChartSeries> chatSeries = new();
     private List<TopFiveMovementDto> TopFiveMovemens = new();
     private List<CategoryPricesDto> ValueInStock = new();
+    private List<ProductStockQuantityPerCategoryDto> StockValueQuantity = new();
 
     private decimal TotalStockValue => ValueInStock.Sum(x => x.Price);
+
+
 
     //campos para o topsolds
     private int _index = -1;
@@ -203,6 +206,7 @@
             ValueInStock = await ApiService.GetValueInStock();
             //Para montar o pie com os dados em cima
             PreparePieChartData();
+            StockValueQuantity = await ApiService.GetStockValueQuantity();
 
             if (Categories.Any())
             {
