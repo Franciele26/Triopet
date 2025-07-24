@@ -71,9 +71,9 @@ else
             <MudDivider Class="my-4" Style="background-color: #333; height: 2px;" />
 
             <MudStack Row Justify="Justify.FlexEnd" Spacing="2">
-                @*<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Editar">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Editar">
                     Editar
-                </MudButton>*@
+                </MudButton>
                 <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="DeleteEntry">
                     Eliminar
                 </MudButton>
@@ -129,5 +129,10 @@ else
     private void GoBack()
     {
         Navig.NavigateTo($"/entries");
+    }
+
+    private void Editar()
+    {
+        Navig.NavigateTo($"/editentry/{Id}");
     }
 }
