@@ -189,15 +189,24 @@ else
 
     private async Task RemoverImagem(ImageDto imagem)
     {
-        var response = await ApiService.DeleteImage(imagem.Id);
-        if (response.IsSuccessStatusCode)
+        if (imagem.Id > 0)
         {
-            ImagensTemporarias.Remove(imagem);
-            Snackbar.Add("Imagem removida com sucesso!", Severity.Success);
+            var response = await ApiService.DeleteImage(imagem.Id);
+            if (response.IsSuccessStatusCode)
+            {
+                ImagensTemporarias.Remove(imagem);
+                Snackbar.Add("Imagem removida com sucesso!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Erro ao remover imagem.", Severity.Error);
+            }
         }
         else
         {
-            Snackbar.Add("Erro ao remover imagem.", Severity.Error);
+            // Imagem temporária, só remover localmente
+            ImagensTemporarias.Remove(imagem);
+            Snackbar.Add("Imagem removida localmente.", Severity.Info);
         }
     }
 }

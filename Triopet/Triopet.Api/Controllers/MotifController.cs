@@ -27,23 +27,16 @@ namespace Triopet.Api.Controllers
                 return NotFound("No motives found");
             }
 
-            var motifList = new List<CategoryDto>();
+            var motifList = new List<ReasonDto>();
 
-            //var result = categories.Select(c => new CategoryDto
-            //{
-            //    Id = c.Id,
-            //    Category = c.CategoryName
-            //}).ToList();
-
-            //ou assim
             foreach (var item in motives)
             {
-                var categoryDto = new CategoryDto
+                var reasonDto = new ReasonDto
                 {
                     Id = item.Id,
-                    Category = item.Reason,
+                    Reason = item.Reason,
                 };
-                motifList.Add(categoryDto);
+                motifList.Add(reasonDto);
             }
 
             return Ok(motifList);
@@ -63,7 +56,7 @@ namespace Triopet.Api.Controllers
 
             if (motif == null)
             {
-                return BadRequest("Error trying to find a certain category");
+                return BadRequest("Error trying to find a certain reason");
             }
 
             return Ok(motif);
