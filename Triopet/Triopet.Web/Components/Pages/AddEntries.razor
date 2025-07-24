@@ -20,16 +20,36 @@ else
 <EditForm Model="NewEntry" OnValidSubmit="OnAddEntry">
     <DataAnnotationsValidator />
 
+   
+
+    <div class="form-group">
+        <label>Filtrar por Categoria:</label>
+        <select class="form-control" @bind="CategoriaFiltroId">
+            <option value="">Todas as categorias</option>
+            @foreach (var cat in Categorias)
+            {
+                <option value="@cat.Id">@cat.Category</option>
+            }
+        </select>
+    </div>
+
     <div class="form-group">
         <label>Produto:</label>
         <select class="form-control" @bind="List.ProductId">
             <option value="">Selecione um produto</option>
-            @foreach (var prod in Products)
+            @foreach (var prod in ProductList)
             {
                 <option value="@prod.Id">@prod.Name</option>
             }
         </select>
     </div>
+    @* <select class="form-control" @bind="List.ProductId">
+        <option value="">Selecione um produto</option>
+        @foreach (var prod in ProdutosFiltrados)
+        {
+            <option value="@prod.Id">@prod.Name</option>
+        }
+    </select> *@
 
     <div class="form-group">
         <label>Quantidade:</label>
@@ -77,7 +97,11 @@ else
     [Parameter]
     public int Id { get; set; }
 
+    private int? CategoriaFiltroId = null;
+
     public string buttonText => Id > 0 ? "Save" : "Add";
+
+    private List<CategoryDto> Categorias = new();
 
     private List<ProductDto> Products = new();
 
@@ -91,16 +115,25 @@ else
         await base.OnInitializedAsync();
 
         Products = await ApiService.GetProductsAsync();
+        Categorias = await ApiService.GetCategoriesAsync();
 
         if (Id > 0)
         {
             var entry = await ApiService.GetEntryById(Id);
             if (entry != null)
             {
+
                 NewEntry = entry;
             }
         }
     }
+
+    private IEnumerable<ProductDto> ProductList =>
+    CategoriaFiltroId.HasValue
+        ? Products.Where(p => p.CategoryId == CategoriaFiltroId.Value)
+        : Products;
+
+
 
     private async Task OnAddEntry()
     {
