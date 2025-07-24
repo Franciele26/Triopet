@@ -22,7 +22,7 @@ namespace Triopet.Api.Controllers
         }
 
         [HttpGet("/lowstock")]
-        public async Task<IActionResult> GetLowStockProducts()
+        public async Task<IActionResult> GetLowStockProducts()//list normal, que de para ordenar por nome ou quantidade
         {
             var calledLowStockItems = await _businessContext.Products
                 .Include(c => c.Category)
@@ -56,7 +56,7 @@ namespace Triopet.Api.Controllers
         }
 
         [HttpGet("/topfivemovements")]
-        public async Task<IActionResult> TopFiveMovements()
+        public async Task<IActionResult> TopFiveMovements()//list de mud que de para filtrar por nome, cat, type ou totalmovements
         {
             var top5Movements = await _businessContext.Products
                 .Include(c => c.Category)
@@ -103,57 +103,49 @@ namespace Triopet.Api.Controllers
         }
 
         [HttpGet("/topSoldItems/{categoryId}")]
-        public async Task<IActionResult> TopSoldItems(int categoryId)
+        public async Task<IActionResult> TopSoldItems(int categoryId)//3 tabelas - charts, em baixo, cada barra é uma categoria,
+                                                                     //de lado fica o SoldQuantity
         {
-            try
+            //Fazer para receber o categoryId apartir do frontend
+            //Venda - motif - sales
+            var productsByCategory = await _businessContext.Products
+            .Include(pe => pe.ProductExits)
+                .ThenInclude(e => e.Exit)
+                    .ThenInclude(m => m.Motif)
+            .Where(p => !p.IsDeleted && p.CategoryId == categoryId)
+            .ToListAsync();
+
+            var topSalesList = new List<TopProductsSoldPerCategoryDto>();
+
+            foreach (var item in productsByCategory)
             {
-                //Fazer para receber o categoryId apartir do frontend
-                //Venda - motif - sales
-                var productsByCategory = await _businessContext.Products
-                .Include(pe => pe.ProductExits)
-                    .ThenInclude(e => e.Exit)
-                        .ThenInclude(m => m.Motif)
-                .Where(p => !p.IsDeleted && p.CategoryId == categoryId)
-                .ToListAsync();
+                //ir buscar os produtos do fetch anterior, os produtos que for de reason Vedas e sumar a quantidade nas saidas
+                //para demonstrar numero produtos vendidos
+                var totalSold = item.ProductExits
+                    .Where(pe => pe.Exit.Motif.Reason == "Venda" || pe.Exit.Motif.Reason == "Sales")
+                    .Sum(pe => pe.Quantity);
 
-                var topSalesList = new List<TopProductsSoldPerCategoryDto>();
-
-                foreach (var item in productsByCategory)
+                //se houver vendas, converter para dto
+                topSalesList.Add(new TopProductsSoldPerCategoryDto
                 {
-                    //ir buscar os produtos do fetch anterior, os produtos que for de reason Vedas e sumar a quantidade nas saidas
-                    //para demonstrar numero produtos vendidos
-                    var totalSold = item.ProductExits
-                        .Where(pe => pe.Exit.Motif.Reason == "Venda" || pe.Exit.Motif.Reason == "Sales")
-                        .Sum(pe => pe.Quantity);
-
-                    //se houver vendas, converter para dto
-                    if (totalSold > 0)
-                    {
-                        topSalesList.Add(new TopProductsSoldPerCategoryDto
-                        {
-                            Id = item.Id,
-                            Name = item.Name,
-                            SoldQuantity = totalSold,
-                        });
-                    }
-                }
-                //ir buscar SO o top 3 dessa lista
-                var topThree = topSalesList.OrderByDescending(s => s.SoldQuantity)
-                    .Take(3).ToList();
-
-
-                return Ok(topThree);
+                    Id = item.Id,
+                    Name = item.Name,
+                    SoldQuantity = totalSold,
+                });
             }
-            catch (Exception ex)
-            {
-                return BadRequest($"Error trying to get the top 3 for category {categoryId}: {ex.Message}");
-            }
+            //ir buscar SO o top 3 dessa lista
+            var topThree = topSalesList.OrderByDescending(s => s.SoldQuantity)
+                .Take(3).ToList();
+
+
+            return Ok(topThree);
         }
+        
 
         //usar CategoryPrices para quando for so preciso os campos das categorias + preço
 
         [HttpGet("/averagePrice/")]
-        public async Task<IActionResult> AveragePricePerCategory()
+        public async Task<IActionResult> AveragePricePerCategory()//vai ser um pie chart
         {
             //produtos -> categoria para name -> select para criar o objt como dto
             var productsByCategory = await _businessContext.Products
@@ -173,7 +165,7 @@ namespace Triopet.Api.Controllers
 
         //nome -> stock -> valor do stock // para orders -> tambem preciso de categoria e tipo de animal
         [HttpGet("/stockValueQuantity")]
-        public async Task<IActionResult> StockValueAndQuantity()
+        public async Task<IActionResult> StockValueAndQuantity()//vai ser uma lista
         {
             var productsStockAndTotal = await _businessContext.Products
                 .Include(c => c.Category)
@@ -199,9 +191,17 @@ namespace Triopet.Api.Controllers
 
             return Ok(productsStockAndTotal);
         }
-        //editar para adicionar tambem o valor total
+        //testar a funçao assim no frontend, se nao der fazer uma nova ou editar o return o que esta em baixo
+        //que vai ser um objt com as Categorias e TotalArmazem e dentro das categorias tem esses valores
+        /*
+         return Ok(new
+        {
+            Categorias = valuesInStockPerCat,
+            TotalArmazem = valuesInStockPerCat.Sum(c => c.Price)
+        });
+         */
         [HttpGet("/valueInStock")]
-        public async Task<IActionResult> ValueInStock()
+        public async Task<IActionResult> ValueInStock()//nao sei, tem de mostrar nome, preço, para cada e um total
         {
             //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
             var valuesInStockPerCat = await _businessContext.Products
