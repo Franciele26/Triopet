@@ -1,63 +1,76 @@
-﻿@page "/productdetails/{Id:int}"
+﻿@page "/productdetails/{Id:int}" 
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
 @using Triopet.Shared.Models
 @rendermode InteractiveServer
 
-<h3>Detalhes do Produto</h3>
+<div style="min-height: 100vh; background-color: #c8e6c9; padding: 20px; margin: 0;">
+    @if (Produto == null)
+    {
+        <MudContainer>
+            <MudText Color="Color.Error">Produto não encontrado.</MudText>
+        </MudContainer>
+    }
+    else
+    {
+        <MudContainer MaxWidth="MaxWidth.Large">
+            <MudPaper Style="background-color: #c8e6c9; color: #2e7d32; border-radius: 16px;" Class="p-6 shadow-lg">
 
+                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4" Style="color: #2e7d32;">
+                    @Produto.Name
+                </MudText>
 
-@if (Produto == null)
-{
-    <MudText Color="Color.Error">Produto não encontrado.</MudText>
-}
-else
-{
-    <MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+                @if (Produto.Images != null && Produto.Images.Any())
+                {
+                    <MudCarousel TData="object" Class="my-4 mx-auto" Style="height:400px; width:600px;" ShowArrows="true" ShowBullets="true">
+                        @foreach (var image in Produto.Images)
+                        {
+                            <MudCarouselItem>
+                                <MudImage Src="@image.Url"
+                                          Alt="@image.Name"
+                                          Style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" />
+                            </MudCarouselItem>
+                        }
+                    </MudCarousel>
+                }
+                else
+                {
+                    <MudText Color="Color.Warning" Class="my-4">Nenhuma imagem disponível para este produto.</MudText>
+                }
 
-        <MudPaper Class="p-4 mt-3">
+                <MudDivider Class="my-4" />
 
+                <MudGrid>
+                    <MudItem xs="12">
+                        <MudText><b>Categoria:</b> @Produto.Category.Category</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText><b>Tipo de Animal:</b> @Produto.AnimalType.AnimalType</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText><b>Descrição:</b> @Produto.Description</MudText>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudText><b>Quantidade:</b> @Produto.Quantity</MudText>
+                    </MudItem>
+                </MudGrid>
 
-            @if (Produto.Images != null && Produto.Images.Any())
-            {
-                <MudCarousel TData="object" Class="my-4" Style="height:400px; width:600px;" ShowArrows="true" ShowBullets="true">
-                    @foreach (var image in Produto.Images)
-                    {
-                        <MudCarouselItem>
-                            <MudImage Src="@image.Url"
-                                      Alt="@image.Name"
-                                      Style="width: 100%; height: 100%; object-fit: contain;" />
-                        </MudCarouselItem>
-                    }
-                </MudCarousel>
-            }  
-            else
-            {
-                <MudText Color="Color.Warning" Class="my-4">Nenhuma imagem disponível para este produto.</MudText>
-            }
+                <div class="mt-6 d-flex justify-end">
+                    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="EditarProduto">Editar</MudButton>
+                    <MudButton Color="Color.Error" Variant="Variant.Filled" Class="ms-2" OnClick="ExcluirProduto">Excluir</MudButton>
+                    <MudButton Color="Color.Secondary" Variant="Variant.Outlined" Class="ms-2" OnClick="Voltar">Voltar</MudButton>
+                </div>
 
-            <MudText><b>Nome:</b> @Produto.Name</MudText>
-            <MudText><b>Categoria:</b> @Produto.Category.Category</MudText>
-            <MudText><b>Tipo de Animal:</b> @Produto.AnimalType.AnimalType</MudText>
-            <MudText><b>Descrição:</b> @Produto.Description</MudText>
-            <MudText><b>Quantidade:</b> @Produto.Quantity</MudText>
+                @if (!string.IsNullOrEmpty(Mensagem))
+                {
+                    <MudText Color="Color.Success" Class="mt-3">@Mensagem</MudText>
+                }
 
-            <div class="mt-4">
-                <MudButton Color="Color.Primary" OnClick="EditarProduto">Editar</MudButton>
-                <MudButton Color="Color.Error" Class="ms-2" OnClick="ExcluirProduto">Excluir</MudButton>
-                <MudButton Color="Color.Secondary" Class="ms-2" OnClick="Voltar">Voltar</MudButton>
-            </div>
+            </MudPaper>
+        </MudContainer>
+    }
 
-            @if (!string.IsNullOrEmpty(Mensagem))
-            {
-                <p class="text-success mt-3">@Mensagem</p>
-            }
-
-        </MudPaper>
-    </MudContainer>
-
-}
-
+</div>
 @code {
 
 
