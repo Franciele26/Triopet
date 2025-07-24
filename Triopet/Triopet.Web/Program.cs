@@ -1,6 +1,3 @@
-using MudBlazor.Services;
-using Refit;
-using Triopet.Web;
 using Triopet.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,29 +6,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.Configure<Microsoft.AspNetCore.Components.Server.CircuitOptions>(options =>
-{
-    options.DetailedErrors = true;
-});
-
-// Adicionar MudBlazor
-builder.Services.AddMudServices();
-
-// Adicionar Refit (serviço da API)
-builder.Services
-    .AddRefitClient<IApiService>()
-    .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:7068"));
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+
+
 app.UseAntiforgery();
 
 app.MapStaticAssets();

@@ -10,9 +10,4 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.6" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Triopet.BusinessContext\Triopet.BusinessContext.csproj" />
-    <ProjectReference Include="..\Triopet.Shared\Triopet.Shared.csproj" />
-  </ItemGroup>
-
 </Project>
