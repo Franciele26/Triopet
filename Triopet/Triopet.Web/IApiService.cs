@@ -90,6 +90,8 @@ namespace Triopet.Web
         [Get("/topfivemovements/")]
         Task<List<TopFiveMovementDto>> GetTopFiveMovements();
 
+        [Get("/valueInStock/")]
+        Task<List<CategoryPricesDto>> GetValueInStock();
         #endregion
 
     }
