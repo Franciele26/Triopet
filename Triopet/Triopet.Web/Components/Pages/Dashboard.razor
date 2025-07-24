@@ -142,13 +142,38 @@
                 </MudPaper>
             </MudItem>
         </MudGrid>
-
     </MudContainer>
 
     @*Placement for Stock - value - quantity / paginar para cada 10 produtos
         Dto a usar -> ProductStockQuantityPerCategoryDto
     *@
-
+    <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+        <MudText Class="stockValueQuantity" Typo="Typo.h5" GutterBottom="true">
+            Top Five Movements
+        </MudText>
+        <MudTable Class="mt-5"
+                  Items="@StockValueQuantity" Hover="true" Breakpoint="Breakpoint.Md"
+                  Loading="@_loading" LoadingProgressColor="Color.Primary">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Category</MudTh>
+                <MudTh>Animal Type</MudTh>
+                <MudTh>Quantity</MudTh>
+                <MudTh>Price Per Unit</MudTh>
+                <MudTh>Total Price</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Category">@context.Category.Category</MudTd>
+                <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
+                <MudTd DataLabel="Quantity">@context.PricePerUnit</MudTd>
+                <MudTd DataLabel="PricePerUnit">@context.Quantity</MudTd>
+                <MudTd DataLabel="TotalPrice">@TotalPriceStockPerProduct</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudContainer>
 
 </div>
 
@@ -164,6 +189,7 @@
     private List<ProductStockQuantityPerCategoryDto> StockValueQuantity = new();
 
     private decimal TotalStockValue => ValueInStock.Sum(x => x.Price);
+    private decimal TotalPriceStockPerProduct => StockValueQuantity.Sum(x => x.Quantity * x.PricePerUnit);
 
 
 

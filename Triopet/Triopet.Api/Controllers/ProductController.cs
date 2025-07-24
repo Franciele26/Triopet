@@ -214,6 +214,22 @@ namespace Triopet.Api.Controllers
             existingProduct.Price = product.PricePerUnit;
             existingProduct.Quantity = product.Quantity;
             //images como fazer? trato aqui ou no image controller
+
+            if (product.Images != null)
+            {
+                foreach (var img in product.Images)
+                {
+                    if (img.Id == 0)
+                    {
+                        existingProduct.Images.Add(new Image
+                        {
+                            ImageUrl = img.Url,
+                            ImageName = img.Name,
+                        });
+                    }
+                }
+            }
+
             existingProduct.UpdatedAt = DateTime.UtcNow;
 
             var response = await _businessContext.SaveChangesAsync(true);
