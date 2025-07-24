@@ -1,7 +1,130 @@
 ﻿@page "/"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject NavigationManager NavigationManager
 
-<PageTitle>Home</PageTitle>
+<div style="min-height: 100vh; padding: 20px;">
+    <h3 style="text-align: center; color: #333;">Produtos Cadastrados</h3>
 
-<h1>Hello, world!</h1>
+    @if (Produtos == null)
+    {
+        <div style="display: flex; justify-content: center; margin-top: 40px;">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+        </div>
+    }
+    else if (!Produtos.Any())
+    {
+        <MudText Typo="Typo.subtitle1" Align="Align.Center">Nenhum produto encontrado.</MudText>
+    }
+    else
+    {
+        <MudGrid Gutter="3">
+            @foreach (var produto in Produtos)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudCard Style="background-color: white; border-radius: 16px; 
+                        box-shadow: 0px 4px 12px rgba(0,0,0,0.1); height: 100%; 
+                        display: flex; flex-direction: column; justify-content: space-between;">
+                        <MudCardContent Class="p-4">
+                            @if (produto.Images != null && produto.Images.Any())
+                            {
+                                <MudImage Src="@produto.Images.First().Url"
+                                          Alt="@produto.Name"
+                                          Style="border-radius: 12px; object-fit: cover;"
+                                          Width="100"
+                                          Height="200" />
+                            }
 
-Welcome to your new app.
+                            <MudText Typo="Typo.h6" Class="mt-2">@produto.Name</MudText>
+                            <MudText Typo="Typo.subtitle2">Qtd: @produto.Quantity</MudText>
+                            <MudText Typo="Typo.body2">@produto.Description</MudText>
+                            <MudText Typo="Typo.caption" Style="color: gray;">Identificação: @produto.Id</MudText>
+                        </MudCardContent>
+
+                        <MudCardActions Class="p-0">
+                            <MudButton Variant="Variant.Filled"
+                                       Style="background-color: #d3d3d3; color: black; border-radius: 0px 0px 16px 16px; width: 100%; font-weight: bold;"
+                                       Href="@($"/productdetails/{produto.Id}")">
+                                Detalhes
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+</div>
+@code {
+    private List<ProductDto> Produtos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Produtos = await ApiService.GetProductsAsync();
+    }
+}
+
+
+@* @page "/"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject NavigationManager NavigationManager
+
+<div style="background-color: #a0e7e5; min-height: 100vh; padding: 20px;">
+    <h3>Produtos Cadastrados</h3>
+
+    @if (Produtos == null)
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+    else if (!Produtos.Any())
+    {
+        <MudText>Nenhum produto encontrado.</MudText>
+    }
+    else
+    {
+    <MudGrid>
+      @foreach (var produto in Produtos)
+      {
+        <MudItem xs="12" sm="6" md="4">
+          <MudCard Class="my-2">
+            <MudCardContent>
+              @if (produto.Images != null && produto.Images.Any())
+              {
+              <MudImage Src="@produto.Images.First().Url" Alt="@produto.Name" 
+                        ObjectFit="ObjectFit.Cover" Width="100" Height="100" />
+              }
+
+             <MudText Typography="Typo.h6">@produto.Name</MudText>
+             <MudText>Qtd: @produto.Quantity</MudText>
+             <MudText>@produto.Description</MudText>
+             <MudText>Id: @produto.Id</MudText>
+             </MudCardContent>
+
+            <MudCardActions>
+              <MudLink Href=@($"/productdetails/{produto.Id}") Style="color: black;">
+                <MudButton Style="background-color: #d3d3d3;"
+                 Variant="Variant.Filled">
+                 Detalhes
+                </MudButton>
+              </MudLink>
+              <MudButton Style="background-color: #d3d3d3; color: black;"
+              Variant="Variant.Filled"
+              OnClick="@(() => NavigationManager.NavigateTo($"/productdetails/{produto.Id}"))">
+              Detalhes
+              </MudButton>                         
+            </MudCardActions>
+          </MudCard>
+        </MudItem>
+      }
+     </MudGrid>
+  }
+</div>
+
+@code {
+    private List<ProductDto> Produtos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Produtos = await ApiService.GetProductsAsync();
+    }
+} *@

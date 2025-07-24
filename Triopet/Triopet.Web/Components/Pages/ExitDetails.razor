@@ -1,0 +1,271 @@
+﻿@page "/exitsdetails/{Id:int}"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navig
+@rendermode InteractiveServer
+@using MudBlazor
+
+<PageTitle>Exit Details</PageTitle>
+
+@if (loading == true)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+}
+else
+{
+    <MudSnackbarProvider />
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+        <MudPaper Elevation="3" Class="pa-6">
+            <MudIconButton OnClick="@GoBack" Icon="@Icons.Material.Filled.ArrowBackIos" />
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="my-2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        Saída:
+                    </MudText>
+                    <MudText Typo="Typo.h6" GutterBottom="true">
+                        @Exit.Id
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        Data:
+                    </MudText>
+                    <MudText Typo="Typo.h6" GutterBottom="true">
+                        @Exit.DateOfExit
+                    </MudText>
+                </MudStack>
+            </MudStack>
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="my-2">
+                <MudText Typo="Typo.h5">Motivo:</MudText>
+                <MudText Typo="Typo.h6">@Exit.Reason.Reason</MudText>
+            </MudStack>
+            <MudDivider Class="my-4" Style="background-color: #333; height: 2px;"></MudDivider>
+
+            <MudText Typo="Typo.h6" GutterBottom="true">Produtos nesta saída</MudText>
+
+            <MudTable Items="@Exit.ProductExitDtos" Class="mb-4">
+                <HeaderContent>
+                    <MudTh>Produto</MudTh>
+                    <MudTh>Categoria</MudTh>
+                    <MudTh>Tipo de Animal</MudTh>
+                    <MudTh>Quantidade</MudTh>
+                    <MudTh>Preço Unidade</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context?.Product?.Name</MudTd>
+                    <MudTd>@context?.Product?.Category.Category</MudTd>
+                    <MudTd>@context?.Product?.AnimalType.AnimalType</MudTd>
+                    <MudTd>@context?.Quantity</MudTd>
+                    <MudTd>@context?.Product?.PricePerUnit</MudTd>
+                </RowTemplate>
+            </MudTable>
+
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="my-2">
+                <MudText Typo="Typo.h5">Total:</MudText>
+                <MudText Typo="Typo.h5" Color="Color.Primary">@Total().ToString("C")</MudText>
+            </MudStack>
+
+            <MudDivider Class="my-4" Style="background-color: #333; height: 2px;" />
+
+            <MudStack Row Justify="Justify.FlexEnd" Spacing="2">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Editar">
+                    Editar
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@DeleteExit">
+                    Eliminar
+                </MudButton>
+            </MudStack>
+
+        </MudPaper>
+    </MudContainer>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    private ExitDto Exit { get; set; } = new();
+    private bool loading { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Snackbar.Clear();
+        if (Id > 0)
+        {
+            loading = true;
+            Exit = await ApiService.GetExitById(Id);
+            await Task.Delay(300);
+            loading = false;
+        }
+    }
+
+    public decimal Total()
+    {
+        if (Exit?.ProductExitDtos == null)
+        {
+            return 0;
+        }
+        return Exit.ProductExitDtos.Sum(p => p.Quantity * p.Product.PricePerUnit);
+    }
+
+    private async Task DeleteExit()
+    {
+        var responseDelete = await ApiService.DeleteExits(Id);
+        if (responseDelete.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            Snackbar.Add($"Exit id {Id} was deleted\nPage will be redirected to the List", Severity.Success);
+            StateHasChanged();
+            await Task.Delay(3000);
+            Navig.NavigateTo("/exits");
+        }
+        else
+        {
+            Snackbar.Add("Error trying to erase exit");
+        }
+    }
+
+    private void GoBack()
+    {
+        Navig.NavigateTo($"/exits");
+    }
+
+    private void Editar()
+    {
+        Navig.NavigateTo($"/editexit/{Id}");
+    }
+}
+
+
+@* @page "/exitsdetails/{Id:int}"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject ISnackbar Snackbar
+@inject NavigationManager Navig
+@rendermode InteractiveServer
+@using MudBlazor
+
+
+<PageTitle>Exit Details</PageTitle>
+
+@if (loading == true)
+{
+    <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" />
+}
+else
+{
+    <MudSnackbarProvider/>
+    <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
+        <MudPaper Elevation="3" Class="pa-6">
+            <MudIconButton OnClick="@GoBack" Icon="@Icons.Material.Filled.ArrowBackIos" />
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="my-2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        Saída:
+                    </MudText>
+                    <MudText Typo="Typo.h6" GutterBottom="true">
+                        @Exit.Id
+                    </MudText>
+                </MudStack>
+                <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        Data:
+                    </MudText>
+                    <MudText Typo="Typo.h6" GutterBottom="true">
+                        @Exit.DateOfExit
+                    </MudText>
+                </MudStack>
+            </MudStack>
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="my-2">
+                <MudText Typo="Typo.h5">Motivo:</MudText>
+                <MudText Typo="Typo.h6">@Exit.Reason.Reason</MudText>
+            </MudStack>
+            <MudDivider Class="my-4" Style="background-color: #333; height: 2px;"></MudDivider>
+
+            <MudText Typo="Typo.h6" GutterBottom="true">Produtos nesta saída</MudText>
+
+            <MudTable Items="@Exit.ProductExitDtos" Class="mb-4">
+                <HeaderContent>
+                    <MudTh>Produto</MudTh>
+                    <MudTh>Categoria</MudTh>
+                    <MudTh>Tipo de Animal</MudTh>
+                    <MudTh>Quantidade</MudTh>
+                    <MudTh>Preço Unidade</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context?.Product?.Name</MudTd>
+
+                    <MudTd>@context?.Product?.Category.Category</MudTd>
+
+                    <MudTd>@context?.Product?.AnimalType.AnimalType</MudTd>
+
+                    <MudTd>@context?.Quantity</MudTd>
+
+                    <MudTd>@context?.Product?.PricePerUnit</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="my-2">
+                <MudText Typo="Typo.h5">Total:</MudText>
+                <MudText Typo="Typo.h5" Color="Color.Primary">@Total().ToString("C")</MudText>
+            </MudStack>
+
+            <MudDivider Class="my-4" Style="background-color: #333; height: 2px;" />
+
+            <MudStack Row Justify="Justify.FlexEnd" Spacing="2">
+
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="DeleteExit">
+                    Eliminar
+                </MudButton>
+            </MudStack>
+
+        </MudPaper>
+    </MudContainer>
+}
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+    private ExitDto Exit { get; set; } = new();
+    private bool loading { get; set; } = false;
+    protected override async Task OnInitializedAsync()
+    {
+        Snackbar.Clear();
+        if (Id > 0)
+        {
+            loading = true;
+            Exit = await ApiService.GetExitById(Id);
+            await Task.Delay(300);
+            loading = false;
+        }
+    }
+
+    public decimal Total()
+    {
+        if (Exit?.ProductExitDtos == null)
+        {
+            return 0;
+        }
+        return Exit.ProductExitDtos.Sum(p => p.Quantity * p.Product.PricePerUnit);
+    }
+
+    private async Task DeleteExit()
+    {
+        var responseDelete = await ApiService.DeleteExits(Id);
+        if (responseDelete.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            Snackbar.Add($"Exit id {Id} was deleted\n" +
+                $"Page will be redirected to the List", Severity.Success);
+            StateHasChanged();
+            await Task.Delay(3000);//vai ficar 3 segundos na pagina
+            Navig.NavigateTo("/exits");
+        }
+        else
+        {
+            Snackbar.Add("Error trying to erase exit");
+        }
+    }
+
+    private void GoBack()
+    {
+        Navig.NavigateTo($"/exits");
+    }
+} *@
