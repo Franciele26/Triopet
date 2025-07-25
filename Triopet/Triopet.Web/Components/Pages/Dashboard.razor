@@ -2,14 +2,14 @@
 @inject IApiService ApiService
 @using Triopet.Shared.Models
 @using Triopet.Shared.Models.DashBoardDtos
-@rendermode InteractiveServer
+@rendermode InteractiveServer 
 
 <PageTitle>Dashboard</PageTitle>
 <div class="page">
     <MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center">
         Dashboard
     </MudText>
-
+    @*<MudPopoverProvider/>*@
     @*Zona para os cards, ascrecentar uns para total de entradas e total de saidas*@
     <MudGrid Class="mt-5" Style="margin-bottom:5vh;" Justify="Justify.Center" Spacing="10">
         <MudItem xs="12" md="3">
@@ -31,11 +31,11 @@
         <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
             Low Stock!!
         </MudText>
-        <MudTable Class="mt-5"
+        <MudTable Class="mt-5" SortLabel="Sort By"
                   Items="@LowStockProducts" Hover="true" Breakpoint="Breakpoint.Md"
                   Loading="@_loading" LoadingProgressColor="Color.Primary">
             <HeaderContent>
-                <MudTh>Id</MudTh>
+                <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
                 <MudTh>Name</MudTh>
                 <MudTh>Category</MudTh>
                 <MudTh>Animal Type</MudTh>
