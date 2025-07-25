@@ -20,15 +20,17 @@ else
 <EditForm Model="NewEntry" OnValidSubmit="OnAddEntry">
     <DataAnnotationsValidator />
 
-   
 
-    <div class="form-group">
-        <label>Filtrar por Categoria:</label>
-        <select class="form-control" @bind="CategoriaFiltroId">
-            <option value="">Todas as categorias</option>
-            @foreach (var cat in Categorias)
+
+    <div class="form-group categorySelection">
+        <label>
+            Category
+        </label>
+        <select class="form-control" value="@SelectedCategory" @onchange="OnCategoryChanged">
+            <option value="0">Select a Category</option>
+            @foreach (var item in Categories)
             {
-                <option value="@cat.Id">@cat.Category</option>
+                <option value="@item.Id">@item.Category</option>
             }
         </select>
     </div>
@@ -37,19 +39,12 @@ else
         <label>Produto:</label>
         <select class="form-control" @bind="List.ProductId">
             <option value="">Selecione um produto</option>
-            @foreach (var prod in ProductList)
+            @foreach (var prod in FilteredProducts)
             {
                 <option value="@prod.Id">@prod.Name</option>
             }
         </select>
     </div>
-    @* <select class="form-control" @bind="List.ProductId">
-        <option value="">Selecione um produto</option>
-        @foreach (var prod in ProdutosFiltrados)
-        {
-            <option value="@prod.Id">@prod.Name</option>
-        }
-    </select> *@
 
     <div class="form-group">
         <label>Quantidade:</label>
@@ -101,7 +96,8 @@ else
 
     public string buttonText => Id > 0 ? "Save" : "Add";
 
-    private List<CategoryDto> Categorias = new();
+    private int SelectedCategory;
+    private List<CategoryDto> Categories = new();
 
     private List<ProductDto> Products = new();
 
@@ -110,12 +106,15 @@ else
     public EntryDto NewEntry = new();
     private string Mensagem = string.Empty;
 
+    private List<ProductDto> FilteredProducts => Products
+    .Where(p => p.Category != null && p.Category.Id == SelectedCategory)
+    .ToList();
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         Products = await ApiService.GetProductsAsync();
-        Categorias = await ApiService.GetCategoriesAsync();
+        Categories = await ApiService.GetCategoriesAsync();
 
         if (Id > 0)
         {
@@ -128,10 +127,11 @@ else
         }
     }
 
-    private IEnumerable<ProductDto> ProductList =>
-    CategoriaFiltroId.HasValue
-        ? Products.Where(p => p.CategoryId == CategoriaFiltroId.Value)
-        : Products;
+    private async Task OnCategoryChanged(ChangeEventArgs e)
+    {
+        SelectedCategory = int.Parse(e.Value?.ToString() ?? "0");
+        StateHasChanged();
+    }
 
 
 
