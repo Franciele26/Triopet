@@ -76,6 +76,7 @@
             </RowTemplate>
         </MudTable>
     </MudContainer>
+
     @*Placement for topSoldItems top 3,bar chart*@
     <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
         <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
@@ -106,6 +107,7 @@
             </MudStack>
         }
     </MudContainer>
+
     @*Placement converter este para pie chart -> Dto a usar -> CategoryPricesDto mas usar o controlador que devolve a media*@
     <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
         <MudText Class="CategoryPricesTitle mt-5" Typo="Typo.h4" GutterBottom="true">
@@ -148,6 +150,7 @@
             Stock Information
         </MudText>
         <MudTable Class="mt-5"
+                  @ref="@StockValueQuantityTable"
                   Items="@StockValueQuantity" Hover="true" Breakpoint="Breakpoint.Md"
                   Loading="@_loading" LoadingProgressColor="Color.Primary"
                   RowsPerPage="10">
@@ -169,6 +172,11 @@
                 <MudTd DataLabel="PricePerUnit">@context.Quantity</MudTd>
                 <MudTd DataLabel="TotalPrice">@(@context.Quantity * @context.PricePerUnit)</MudTd>
             </RowTemplate>
+            <PagerContent>
+                <MudPagination SelectedChanged="PageChanged" 
+                               Count="@((StockValueQuantityTable.GetFilteredItemsCount() + StockValueQuantityTable.RowsPerPage - 1) / StockValueQuantityTable.RowsPerPage)"
+                               Class="pa-4"/>
+            </PagerContent>
         </MudTable>
     </MudContainer>
 
@@ -183,7 +191,9 @@
     private List<ChartSeries> chatSeries = new();
     private List<TopFiveMovementDto> TopFiveMovemens = new();
     private List<CategoryPricesDto> ValueInStock = new();
+
     private List<ProductStockQuantityPerCategoryDto> StockValueQuantity = new();
+    private MudTable<ProductStockQuantityPerCategoryDto> StockValueQuantityTable = new();
 
     private decimal TotalStockValue => ValueInStock.Sum(x => x.Price);
     //private decimal TotalPriceStockPerProduct => StockValueQuantity.Sum(x => x.Quantity * x.PricePerUnit);
@@ -245,6 +255,9 @@
             Message = "Erro a receber os dados da base de dados";
         }
     }
+
+    //bar cart with category change
+
     private async Task OnCategoryChanged(ChangeEventArgs e)
     {
         if (int.TryParse(e.Value?.ToString(), out int categoryId))
@@ -279,9 +292,17 @@
         }
     }
 
+    //pie chart
+
     private void PreparePieChartData()
     {
         PieData = ValueInStock.Select(x => (double)x.Price).ToArray();
         PieLabels = ValueInStock.Select(x => x.CategoryName).ToArray();
+    }
+
+    //pagination
+    private void PageChanged(int i)
+    {
+        StockValueQuantityTable.NavigateTo(i-1);
     }
 }
