@@ -5,7 +5,7 @@
 @rendermode InteractiveServer
 
 <div class="mx-4">
-    <h3 style="text-align: center; color: #333; margin-bottom:5vh;">Produtos Cadastrados</h3>
+    <h3 style="text-align: center; color: #333; margin-bottom:5vh;">Registered Products</h3>
 
     @if (Produtos == null)
     {
@@ -23,18 +23,18 @@
             @foreach (var produto in PagedProdutos)
             {
                 <MudItem xs="12" sm="6" md="4">
-                    <MudCard Style="background-color: white; border-radius: 16px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                        <MudCard Class="m-2" Style="height: 200px;">
-                            <div style="display: flex; height: 100%;">
-                                <!-- Imagem à esquerda -->
-                                @if (produto.Images != null && produto.Images.Any())
-                                {
-                                    <div style="flex: 1; overflow: hidden; border-radius: 12px 0 0 12px;">
-                                        <MudImage Src="@produto.Images.First().Url"
-                                                  Alt="@produto.Name"
-                                                  Style="width: 100%; height: 100%; object-fit: cover;" />
-                                    </div>
-                                }
+                <MudCard Style="background-color: white; border-radius: 16px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <MudCard Class="m-2" Style="height: 200px;">
+                   <div style="display: flex; height: 100%;">
+                      <!-- Imagem à esquerda -->
+                     @if (produto.Images != null && produto.Images.Any())
+                     {
+                     <div style="flex: 1; overflow: hidden; border-radius: 12px 0 0 12px;">
+                       <MudImage Src="@produto.Images.First().Url"
+                        Alt="@produto.Name"
+                        Style="width: 100%; height: 100%; object-fit: cover;" />
+                     </div>
+                     }
 
                                 <!-- Texto à direita -->
                                 <div style="flex: 1; padding: 16px;">
@@ -86,7 +86,7 @@
         Produtos = await ApiService.GetProductsAsync();
         Produtos = Produtos.OrderBy(p => p.Name).ToList();
     }
-
+          
     private int GetTotalPages()
     {
         if (Produtos == null || Produtos.Count == 0)
@@ -94,8 +94,8 @@
             return 1;
         }
         return (int)Math.Ceiling((double)(Produtos?.Count ?? 0) / ItemsPerPage);
-
     }
+          
     private async Task OnPageChanged(int page)
     {
         CurrentPage = page;

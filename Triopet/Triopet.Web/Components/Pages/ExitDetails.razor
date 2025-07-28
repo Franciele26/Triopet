@@ -17,7 +17,6 @@ else
     <MudSnackbarProvider />
     <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="mt-4">
         <MudPaper Elevation="3" Class="pa-6">
-            <MudIconButton OnClick="@GoBack" Icon="@Icons.Material.Filled.ArrowBackIos" />
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="my-2">
                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
                     <MudText Typo="Typo.h5" GutterBottom="true">
@@ -70,10 +69,10 @@ else
 
             <MudStack Row Justify="Justify.FlexEnd" Spacing="2">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@Editar">
-                    Editar
+                    Edit
                 </MudButton>
                 <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="@DeleteExit">
-                    Eliminar
+                    Delete
                 </MudButton>
             </MudStack>
 
@@ -122,11 +121,6 @@ else
         {
             Snackbar.Add("Error trying to erase exit");
         }
-    }
-
-    private void GoBack()
-    {
-        Navig.NavigateTo($"/exits");
     }
 
     private void Editar()
