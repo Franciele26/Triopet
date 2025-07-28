@@ -2,9 +2,10 @@
 @using Triopet.Shared.Models
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JS
 
 <div style="background-color: #a0e7e5; min-height: 100vh; padding: 20px;">
-    <h3 style="text-align: center; color: #333;">Produtos Cadastrados</h3>
+    <h3 style="text-align: center; color: #333;">Registered Products</h3>
 
     @if (Produtos == null)
     {
@@ -22,38 +23,64 @@
             @foreach (var produto in Produtos)
             {
                 <MudItem xs="12" sm="6" md="4">
-                    <MudCard Style="background-color: white; border-radius: 16px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
-                        <MudCard Class="m-2" Style="height: 200px;">
-                            <div style="display: flex; height: 100%;">
-                                <!-- Imagem à esquerda -->
-                                @if (produto.Images != null && produto.Images.Any())
-                                {
-                                    <div style="flex: 1; overflow: hidden; border-radius: 12px 0 0 12px;">
-                                        <MudImage Src="@produto.Images.First().Url"
-                                                  Alt="@produto.Name"
-                                                  Style="width: 100%; height: 100%; object-fit: cover;" />
-                                    </div>
-                                }
+                <MudCard Style="background-color: white; border-radius: 16px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                <MudCard Class="m-2" Style="height: 200px;">
+                   <div style="display: flex; height: 100%;">
+                      <!-- Imagem à esquerda -->
+                     @if (produto.Images != null && produto.Images.Any())
+                     {
+                     <div style="flex: 1; overflow: hidden; border-radius: 12px 0 0 12px;">
+                       <MudImage Src="@produto.Images.First().Url"
+                        Alt="@produto.Name"
+                        Style="width: 100%; height: 100%; object-fit: cover;" />
+                     </div>
+                     }
 
-                                <!-- Texto à direita -->
-                                <div style="flex: 1; padding: 16px;">
-                                    <MudText Typo="Typo.h6">@produto.Name</MudText>
-                                    <MudText Typo="Typo.subtitle2">Qtd: @produto.Quantity</MudText>
-                                    <MudText Typo="Typo.caption" Style="color: gray;">Identificação: @produto.Id</MudText>
-                                </div>
-                            </div>
-                        </MudCard>
-                        <MudCardActions Class="p-0">
-                            <MudButton Variant="Variant.Filled"
-                                       Style="background-color: #d3d3d3; color: black; border-radius: 0px 0px 16px 16px; width: 100%; font-weight: bold;"
-                                       Href="@($"/productdetails/{produto.Id}")">
-                                Detalhes
-                            </MudButton>
-                        </MudCardActions>
-                    </MudCard>
+                     <!-- Texto à direita -->
+                     <div style="flex: 1; padding: 16px;">
+                      <MudText Typo="Typo.h6">@produto.Name</MudText>
+                      <MudText Typo="Typo.subtitle2">Qtd: @produto.Quantity</MudText>
+                      <MudText Typo="Typo.caption" Style="color: gray;">Identificação: @produto.Id</MudText>
+                     </div>
+                    </div>
+                   </MudCard>
+                   <MudCardActions Class="p-0">
+                   <MudButton Variant="Variant.Filled"
+                     Style="background-color: #d3d3d3; color: black; border-radius: 0px 0px 16px 16px; width: 100%; font-weight: bold;"
+                     Href="@($"/productdetails/{produto.Id}")">
+                                Details
+                   </MudButton>
+                   </MudCardActions>
+                   </MudCard>
                 </MudItem>
             }
         </MudGrid>
+        <button class="btn-topo" @onclick="VoltarAoTopo">
+            ⬆️
+        </button>
+
+       <style>
+    .btn-topo {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 32px;
+        color: #666;
+        cursor: pointer;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        width: 80px; 
+        height: 80px;
+    }
+
+</style>
+
     }
 </div>
 @code {
@@ -64,5 +91,11 @@
     {
         Produtos = await ApiService.GetProductsAsync();
         Produtos = Produtos.OrderBy(p => p.Name).ToList();
+    }
+
+    private async Task VoltarAoTopo()
+    {
+        Console.WriteLine(">>> CLICOU NO BOTÃO <<<");
+        await JS.InvokeVoidAsync("scrollToTop");
     }
 }
