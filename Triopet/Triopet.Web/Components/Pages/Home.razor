@@ -2,7 +2,6 @@
 @using Triopet.Shared.Models
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
 @rendermode InteractiveServer
 
 <div class="mx-4">
@@ -58,31 +57,6 @@
             }
         </MudGrid>
         <MudPagination Count="@GetTotalPages()" Selected="@CurrentPage" SelectedChanged="OnPageChanged" Class="pa-4" />
-        <button class="btn-topo" @onclick="VoltarAoTopo">
-            ⬆️
-        </button>
-
-       <style>
-    .btn-topo {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: none;
-        border: none;
-        padding: 0;
-        font-size: 32px;
-        color: #666;
-        cursor: pointer;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        line-height: 1;
-        width: 80px; 
-        height: 80px;
-    }
-
-</style>
     }
 </div>
 @code {
@@ -111,11 +85,6 @@
     {
         Produtos = await ApiService.GetProductsAsync();
         Produtos = Produtos.OrderBy(p => p.Name).ToList();
-    }
-    private async Task VoltarAoTopo()
-    {
-        Console.WriteLine(">>> CLICOU NO BOTÃO <<<");
-        await JS.InvokeVoidAsync("scrollToTop");
     }
           
     private int GetTotalPages()
