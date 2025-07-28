@@ -40,11 +40,24 @@
             </select>
         </div>
 
+        <div class="form-group categorySelection">
+            <label>
+                Category
+            </label>
+            <select class="form-control" value="@SelectedCategory" @onchange="OnCategoryChanged">
+                <option value="0">Select a Category</option>
+                @foreach (var item in Categories)
+                {
+                    <option value="@item.Id">@item.Category</option>
+                }
+            </select>
+        </div>
+
         <div class="form-group">
             <label>Product:</label>
             <select class="form-control" @bind="List.ProductId">
                 <option value="">Selecione um produto</option>
-                @foreach (var prod in Products)
+                @foreach (var prod in FilteredProducts)
                 {
                     <option value="@prod.Id">@prod.Name</option>
                 }
@@ -52,6 +65,7 @@
 
             <label>Quantity:</label>
             <input type="number" class="form-control" @bind="List.Quantity" />
+
 
             <button type="button" class="btn btn-success mt-2" @onclick="AddProductToList">Add Product</button>
 @*             <button type="button" class="btn btn-success mt-2" @onclick="EditarProduto">Editar</button>
@@ -100,11 +114,19 @@
     private ExitDto NewExit = new();
     private string Mensagem = string.Empty;
 
+    private int SelectedCategory;
+    private List<CategoryDto> Categories = new();
+
+    private List<ProductDto> FilteredProducts => Products
+    .Where(p => p.Category != null && p.Category.Id == SelectedCategory)
+    .ToList();
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         Reasons = await ApiService.GetReasonsAsync();
         Products = await ApiService.GetProductsAsync();
+        Categories = await ApiService.GetCategoriesAsync();
 
         if (Id > 0)
         {
@@ -117,11 +139,17 @@
         }
     }
 
+    private async Task OnCategoryChanged(ChangeEventArgs e)
+    {
+        SelectedCategory = int.Parse(e.Value?.ToString() ?? "0");
+        StateHasChanged();
+    }
+
     private void EditarProduto()
     {
         NavigationManager.NavigateTo($"/editproduct/{Id}");
     }
-      
+
     private void RemoveProduct(ProductExitDto item)
     {
         NewExit.ProductExitDtos.Remove(item);

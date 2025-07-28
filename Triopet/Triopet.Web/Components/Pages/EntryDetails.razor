@@ -22,7 +22,7 @@ else
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="my-2">
                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
                     <MudText Typo="Typo.h5" GutterBottom="true">
-                        Entradas:
+                        Entries:
                     </MudText>
                     <MudText Typo="Typo.h6" GutterBottom="true">
                         @Entry.Id
@@ -30,7 +30,7 @@ else
                 </MudStack>
                 <MudStack Row="true" AlignItems="AlignItems.Center" Class="my-2">
                     <MudText Typo="Typo.h5" GutterBottom="true">
-                        Data:
+                        Date:
                     </MudText>
                     <MudText Typo="Typo.h6" GutterBottom="true">
                         @Entry.DateOfEntry
@@ -41,15 +41,15 @@ else
             </MudStack>
             <MudDivider Class="my-4" Style="background-color: #333; height: 2px;"></MudDivider>
 
-            <MudText Typo="Typo.h6" GutterBottom="true">Produtos nesta saída</MudText>
+            <MudText Typo="Typo.h6" GutterBottom="true">Exit list products</MudText>
 
             <MudTable Items="@Entry.ProductEntries" Class="mb-4">
                 <HeaderContent>
-                    <MudTh>Produto</MudTh>
-                    <MudTh>Categoria</MudTh>
-                    <MudTh>Tipo de Animal</MudTh>
-                    <MudTh>Quantidade</MudTh>
-                    <MudTh>Preço Unidade</MudTh>
+                    <MudTh>Product</MudTh>
+                    <MudTh>Category</MudTh>
+                    <MudTh>Type of animal</MudTh>
+                    <MudTh>Quantity</MudTh>
+                    <MudTh>Unit Price</MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>@context?.Product?.Name</MudTd>
@@ -72,10 +72,10 @@ else
 
             <MudStack Row Justify="Justify.FlexEnd" Spacing="2">
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Editar">
-                    Editar
+                    Edit
                 </MudButton>
                 <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="DeleteEntry">
-                    Eliminar
+                    Delete
                 </MudButton>
             </MudStack>
 
