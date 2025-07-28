@@ -17,6 +17,11 @@
         <HeaderContent>
             <MudTh>Id</MudTh>
             <MudTh>Date</MudTh>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="@OnAddEntry">
+                Add
+            </MudButton>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -65,10 +70,14 @@
 
         {
 
-            Message = "Erro ao tentar procurar lista de entradas";
+            Message = "Error, while trying to search for the entry list";
 
         }
 
+    }
+    private void OnAddEntry()
+    {
+        Nav.NavigateTo($"/addentry");
     }
 
     private void OnViewEntries(int id)
