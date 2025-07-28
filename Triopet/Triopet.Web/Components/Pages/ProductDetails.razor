@@ -1,10 +1,10 @@
-﻿@page "/productdetails/{Id:int}" 
+﻿@page "/productdetails/{Id:int}"
 @inject IApiService ApiService
 @inject NavigationManager NavigationManager
 @using Triopet.Shared.Models
 @rendermode InteractiveServer
 
-<div style="min-height: 100vh; background-color: #c8e6c9; padding: 20px; margin: 0;">
+<div style="min-height: 100vh; background-color: #e3f2fd; padding: 20px; margin: 0;">
     @if (Produto == null)
     {
         <MudContainer>
@@ -14,71 +14,69 @@
     else
     {
         <MudContainer MaxWidth="MaxWidth.Large">
-            <MudPaper Style="background-color: #c8e6c9; color: #2e7d32; border-radius: 16px;" Class="p-6 shadow-lg">
 
-                <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4" Style="color: #2e7d32;">
-                    @Produto.Name
-                </MudText>
+            <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4" Style="color: #1565c0;">
+                @Produto.Name
+            </MudText>
 
-                @if (Produto.Images != null && Produto.Images.Any())
-                {
-                    <MudCarousel TData="object" Class="my-4 mx-auto" Style="height:400px; width:600px;" ShowArrows="true" ShowBullets="true">
-                        @foreach (var image in Produto.Images)
-                        {
-                            <MudCarouselItem>
-                                <MudImage Src="@image.Url"
-                                          Alt="@image.Name"
-                                          Style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" />
-                            </MudCarouselItem>
-                        }
-                    </MudCarousel>
-                }
-                else
-                {
-                    <MudText Color="Color.Warning" Class="my-4">Nenhuma imagem disponível para este produto.</MudText>
-                }
+            @if (Produto.Images != null && Produto.Images.Any())
+            {
+                <MudCarousel TData="object" Class="my-4 mx-auto"
+                             Style="height:400px; width:600px;"
+                             ShowArrows="true" ShowBullets="true">
+                    @foreach (var image in Produto.Images)
+                    {
+                        <MudCarouselItem>
+                            <MudImage Src="@image.Url"
+                                      Alt="@image.Name"
+                                      Style="width: 100%; height: 100%; object-fit: contain; border-radius: 12px;" />
+                        </MudCarouselItem>
+                    }
+                </MudCarousel>
+            }
+            else
+            {
+                <MudText Color="Color.Warning" Class="my-4">Nenhuma imagem disponível para este produto.</MudText>
+            }
 
-                <MudDivider Class="my-4" />
+            <MudDivider Class="my-4" />
 
-                <MudGrid>
-                    <MudItem xs="12">
-                        <MudText><b>Categoria:</b> @Produto.Category.Category</MudText>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudText><b>Tipo de Animal:</b> @Produto.AnimalType.AnimalType</MudText>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudText><b>Descrição:</b> @Produto.Description</MudText>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudText><b>Quantidade:</b> @Produto.Quantity</MudText>
-                    </MudItem>
-                </MudGrid>
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText><b>Category:</b> @Produto.Category.Category</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText><b>Animal Type:</b> @Produto.AnimalType.AnimalType</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText><b>Description:</b> @Produto.Description</MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText><b>Quantity:</b> @Produto.Quantity</MudText>
+                </MudItem>
+            </MudGrid>
 
-                <div class="mt-6 d-flex justify-end">
-                    <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="EditarProduto">Editar</MudButton>
-                    <MudButton Color="Color.Error" Variant="Variant.Filled" Class="ms-2" OnClick="ExcluirProduto">Excluir</MudButton>
-                    <MudButton Color="Color.Secondary" Variant="Variant.Outlined" Class="ms-2" OnClick="Voltar">Voltar</MudButton>
-                </div>
+            <div class="mt-6 d-flex justify-end">
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="EditarProduto">Edit</MudButton>
+                <MudButton Color="Color.Error" Variant="Variant.Filled" Class="ms-2" OnClick="ExcluirProduto">Delete</MudButton>
+                <MudButton Color="Color.Secondary" Variant="Variant.Outlined" Class="ms-2" OnClick="Voltar">Back</MudButton>
+            </div>
 
-                @if (!string.IsNullOrEmpty(Mensagem))
-                {
-                    <MudText Color="Color.Success" Class="mt-3">@Mensagem</MudText>
-                }
-
-            </MudPaper>
+            @if (!string.IsNullOrEmpty(Mensagem))
+            {
+                <MudText Color="Color.Success" Class="mt-3">@Mensagem</MudText>
+            }
         </MudContainer>
     }
-
 </div>
+
 @code {
-
-
     [Parameter]
     public int Id { get; set; }
 
     private ProductDto Produto;
     private string Mensagem = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -91,10 +89,8 @@
         }
     }
 
-    private void EditarProduto()
-    {
-        NavigationManager.NavigateTo($"/editproduct/{Id}");
-    }
+    private void EditarProduto() => NavigationManager.NavigateTo($"/editproduct/{Id}");
+    private void Voltar() => NavigationManager.NavigateTo("/");
 
     private async Task ExcluirProduto()
     {
@@ -116,10 +112,5 @@
         {
             Mensagem = "Erro ao excluir o produto.";
         }
-    }
-
-    private void Voltar()
-    {
-        NavigationManager.NavigateTo("/");
     }
 }
