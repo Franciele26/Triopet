@@ -38,7 +38,8 @@
 
                                 <!-- Texto à direita -->
                                 <div style="flex: 1; padding: 16px;">
-                                    <MudText Typo="Typo.h6">@produto.Name</MudText>
+                                    <MudText Typo="Typo.h6" Style="word-break: break-word; overflow: hidden;
+                                    text-overflow: ellipsis; display:-webkit-box; -webkit-line-clamp: 3; -webkit-box-orient:vertical;">@produto.Name</MudText>
                                     <MudText Typo="Typo.subtitle2">Qtd: @produto.Quantity</MudText>
                                     <MudText Typo="Typo.caption" Style="color: gray;">Identificação: @produto.Id</MudText>
                                 </div>
@@ -88,7 +89,7 @@
 
     private int GetTotalPages()
     {
-        if(Produtos == null || Produtos.Count == 0)
+        if (Produtos == null || Produtos.Count == 0)
         {
             return 1;
         }

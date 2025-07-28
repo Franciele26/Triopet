@@ -17,11 +17,13 @@
         <HeaderContent>
             <MudTh>Id</MudTh>
             <MudTh>Date</MudTh>
-            <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
-                       StartIcon="@Icons.Material.Filled.Add"
-                       OnClick="@OnAddEntry">
-                Add
-            </MudButton>
+            <MudTh>
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@OnAddEntry">
+                    Add
+                </MudButton>
+            </MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -35,7 +37,7 @@
         </RowTemplate>
         <PagerContent>
             <MudPagination Class="pa-4"
-                           SelectedChanged="OnPageChange" Count="@((EntryTable.GetFilteredItemsCount() + EntryTable.RowsPerPage - 1) / EntryTable.RowsPerPage)"/>
+                           SelectedChanged="OnPageChange" Count="@((EntryTable.GetFilteredItemsCount() + EntryTable.RowsPerPage - 1) / EntryTable.RowsPerPage)" />
         </PagerContent>
     </MudTable>
 
