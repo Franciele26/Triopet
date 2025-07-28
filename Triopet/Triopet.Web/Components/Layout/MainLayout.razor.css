@@ -79,6 +79,7 @@ main {
 
 article {
     background-color: #a0e7e5;
+    min-height: 100vh;
 }
 
 

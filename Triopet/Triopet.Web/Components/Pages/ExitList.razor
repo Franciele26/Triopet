@@ -12,8 +12,10 @@
 
 <div class="exit-list mt-3">
     <MudSnackbarProvider />
-    <MudTable Items="@Exits" Hover="true" Breakpoint="Breakpoint.Md"
-              Loading="@_loading" LoadingProgressColor="Color.Primary">
+    <MudTable @ref="@ExitTable"
+              Items="@Exits" Hover="true" Breakpoint="Breakpoint.Md"
+              Loading="@_loading" LoadingProgressColor="Color.Primary"
+              RowsPerPage="6">
         <HeaderContent>
             <MudTh>Id</MudTh>
             <MudTh>Date</MudTh>
@@ -36,11 +38,16 @@
                                aria-label="Detail">
                 </MudIconButton>
                 @*<MudIconButton @onclick="() => OnDeleteExit(context)"
-                               Variant="Variant.Filled" Icon="@Icons.Material.Rounded.Delete" Color="Color.Warning"
-                               aria-label="Delete">
-                </MudIconButton>*@
+                                   Variant="Variant.Filled" Icon="@Icons.Material.Rounded.Delete" Color="Color.Warning"
+                                   aria-label="Delete">
+                    </MudIconButton>*@
             </MudTd>
         </RowTemplate>
+        <PagerContent>
+            <MudPagination SelectedChanged="OnPageChanged" Count="@((ExitTable.GetFilteredItemsCount() + ExitTable.RowsPerPage - 1) / ExitTable.RowsPerPage)"
+                           Class="pa-4"
+                           />
+        </PagerContent>
     </MudTable>
 
     <h3>@Message</h3>
@@ -49,6 +56,7 @@
 
 @code {
     private List<ExitDto> Exits { get; set; } = new();
+    private MudTable<ExitDto> ExitTable = new();
     private string Message { get; set; } = string.Empty;
     private bool _loading = false;
 
@@ -78,5 +86,10 @@
     private void OnViewExits(int id)
     {
         Nav.NavigateTo($"/exitsdetails/{id}");
+    }
+
+    private void OnPageChanged(int i)
+    {
+        ExitTable.NavigateTo(i - 1);
     }
 }
