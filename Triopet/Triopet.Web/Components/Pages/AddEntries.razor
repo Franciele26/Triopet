@@ -27,7 +27,7 @@ else
             Category
         </label>
         <select class="form-control" value="@SelectedCategory" @onchange="OnCategoryChanged">
-            <option value="0">Select a Category</option>
+            <option value="0">Select a category</option>
             @foreach (var item in Categories)
             {
                 <option value="@item.Id">@item.Category</option>
@@ -38,7 +38,7 @@ else
     <div class="form-group">
         <label>Product:</label>
         <select class="form-control" @bind="List.ProductId">
-            <option value="">Selecione um produto</option>
+            <option value="">Select a product</option>
             @foreach (var prod in FilteredProducts)
             {
                 <option value="@prod.Id">@prod.Name</option>
