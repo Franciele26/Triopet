@@ -95,6 +95,13 @@ namespace Triopet.Web
 
         [Get("/stockValueQuantity/")]
         Task<List<ProductStockQuantityPerCategoryDto>> GetStockValueQuantity();
+
+        [Get("/entriesPerCategory/")]
+        Task<List<MovementPerCategory>> GetEntryByCategory();
+
+        [Get("/exitsPerCategory/")]
+        Task<List<MovementPerCategory>> GetExitsByCategory();
+
         #endregion
 
     }
