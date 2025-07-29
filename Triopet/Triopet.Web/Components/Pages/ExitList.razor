@@ -7,6 +7,7 @@
 @using MudBlazor
 
 <PageTitle>Exits</PageTitle>
+<MudPopoverProvider />
 
 <MudText Typo="Typo.h3" Align="Align.Center" Class="mb-4">
     List of Exits
@@ -19,10 +20,9 @@
               Loading="@_loading" LoadingProgressColor="Color.Primary"
               RowsPerPage="6">
         <HeaderContent>
-            <MudTh>Id</MudTh>
-            <MudTh>Date</MudTh>
-            <MudTh>Motif</MudTh>
-            <MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ExitDto, object>(d => d.DateOfExit)">Date</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ExitDto, object>(m => m.Reason.Reason)">Motif</MudTableSortLabel></MudTh>
+            <MudTh Class="d-flex align-items-center justify-content-center">
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
                            StartIcon="@Icons.Material.Filled.Add"
                            OnClick="@OnAddExit">
@@ -31,18 +31,13 @@
             </MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
             <MudTd DataLabel="Date">@context.DateOfExit</MudTd>
             <MudTd DataLabel="Motif">@context.Reason.Reason</MudTd>
-            <MudTd DataLabel="Action">
+            <MudTd DataLabel="Action" Class="d-flex align-items-center justify-content-center">
                 <MudIconButton @onclick="() => OnViewExits(context.Id)"
                                Variant="Variant.Filled" Icon="@Icons.Material.Outlined.Visibility" Color="Color.Warning"
                                aria-label="Detail">
                 </MudIconButton>
-                @*<MudIconButton @onclick="() => OnDeleteExit(context)"
-                                   Variant="Variant.Filled" Icon="@Icons.Material.Rounded.Delete" Color="Color.Warning"
-                                   aria-label="Delete">
-                    </MudIconButton>*@
             </MudTd>
         </RowTemplate>
         <PagerContent>
