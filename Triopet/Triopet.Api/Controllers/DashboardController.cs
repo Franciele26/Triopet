@@ -216,5 +216,40 @@ namespace Triopet.Api.Controllers
 
             return Ok(valuesInStockPerCat);
         }
+
+        [HttpGet("/entriesPerCategory")]
+        public async Task<IActionResult> EntriesPerCategory()//nao sei, tem de mostrar nome, preço, para cada e um total
+        {
+            //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
+            var entriesPerCategory = await _businessContext.ProductEntries
+                .Include(pe => pe.Product)
+                .ThenInclude(c => c.Category)
+                .GroupBy(pe => new { pe.Product.CategoryId, pe.Product.Category.CategoryName })
+                .Select(g => new MovementPerCategory
+                {
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = g.Key.CategoryName,
+                    NumberMovements = g.Count()
+                }).ToListAsync();
+
+            return Ok(entriesPerCategory);
+        }
+        [HttpGet("/exitsPerCategory")]
+        public async Task<IActionResult> ExitsPerCategory()//nao sei, tem de mostrar nome, preço, para cada e um total
+        {
+            //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
+            var exitsPerCategory = await _businessContext.ProductExits
+                .Include(pe => pe.Product)
+                .ThenInclude(c => c.Category)
+                .GroupBy(pe => new { pe.Product.CategoryId, pe.Product.Category.CategoryName })
+                .Select(g => new MovementPerCategory
+                {
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = g.Key.CategoryName,
+                    NumberMovements = g.Count()
+                }).ToListAsync();
+
+            return Ok(exitsPerCategory);
+        }
     }
 }

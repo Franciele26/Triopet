@@ -142,6 +142,70 @@
         </MudGrid>
     </MudContainer>
 
+    @*Pie chart para movimentos e le categorias
+        categorias para entrada*@
+    <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+        <MudText Class="EntriesPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
+            Number of Entries per Category
+        </MudText>
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4">
+                    <MudChart ChartType="ChartType.Pie"
+                              InputData="@PieDataEntries"
+                              InputLabels="@PieLabelsEntries"
+                              Width="500px" Height="400px" />
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTable Items="@EntryPerCategory" Hover="true" Breakpoint="Breakpoint.Md"
+                          Loading="@_loading" LoadingProgressColor="Color.Primary"
+                          Style="border-color:transparent; margin-bottom:1vh">
+                    <HeaderContent>
+                        <MudTh>Category</MudTh>
+                        <MudTh>Total Entries</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Category">@context.CategoryName</MudTd>
+                        <MudTd DataLabel="TotalEntries">@context.NumberMovements</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+
+    @*Pie chart para movimentos e le categorias
+        categorias para saida*@
+    <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+        <MudText Class="ExitsPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
+            Number of Exits per Category
+        </MudText>
+        <MudGrid>
+            <MudItem xs="12" md="6">
+                <MudPaper Class="pa-4">
+                    <MudChart ChartType="ChartType.Pie"
+                              InputData="@PieDataExits"
+                              InputLabels="@PieLabelsExits"
+                              Width="500px" Height="400px" />
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="6">
+                <MudTable Items="@ExitPerCategory" Hover="true" Breakpoint="Breakpoint.Md"
+                          Loading="@_loading" LoadingProgressColor="Color.Primary"
+                          Style="border-color:transparent; margin-bottom:1vh">
+                    <HeaderContent>
+                        <MudTh>Category</MudTh>
+                        <MudTh>Total Exits</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Category">@context.CategoryName</MudTd>
+                        <MudTd DataLabel="TotalEntries">@context.NumberMovements</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
+
     @*Placement for Stock - value - quantity / paginar para cada 10 produtos
         Dto a usar -> ProductStockQuantityPerCategoryDto
     *@
@@ -173,9 +237,9 @@
                 <MudTd DataLabel="TotalPrice">@(@context.Quantity * @context.PricePerUnit)</MudTd>
             </RowTemplate>
             <PagerContent>
-                <MudPagination SelectedChanged="PageChanged" 
+                <MudPagination SelectedChanged="PageChanged"
                                Count="@((StockValueQuantityTable.GetFilteredItemsCount() + StockValueQuantityTable.RowsPerPage - 1) / StockValueQuantityTable.RowsPerPage)"
-                               Class="pa-4"/>
+                               Class="pa-4" />
             </PagerContent>
         </MudTable>
     </MudContainer>
@@ -192,6 +256,11 @@
     private List<TopFiveMovementDto> TopFiveMovemens = new();
     private List<CategoryPricesDto> ValueInStock = new();
 
+
+    private List<MovementPerCategory> EntryPerCategory = new();
+    private List<MovementPerCategory> ExitPerCategory = new();
+
+
     private List<ProductStockQuantityPerCategoryDto> StockValueQuantity = new();
     private MudTable<ProductStockQuantityPerCategoryDto> StockValueQuantityTable = new();
 
@@ -207,6 +276,10 @@
     //Pie Data
     private double[] PieData;
     private string[] PieLabels;
+    private double[] PieDataEntries;
+    private string[] PieLabelsEntries;
+    private double[] PieDataExits;
+    private string[] PieLabelsExits;
 
     //Serve para ir buscar e trocar a categoria em maneira responsiva
     private int selectedCategory;
@@ -237,6 +310,8 @@
             Categories = await ApiService.GetCategoriesAsync();
             TopFiveMovemens = await ApiService.GetTopFiveMovements();
             ValueInStock = await ApiService.GetValueInStock();
+            EntryPerCategory = await ApiService.GetEntryByCategory();
+            ExitPerCategory = await ApiService.GetExitsByCategory();
             //Para montar o pie com os dados em cima
             PreparePieChartData();
             StockValueQuantity = await ApiService.GetStockValueQuantity();
@@ -296,13 +371,22 @@
 
     private void PreparePieChartData()
     {
+        //pie para value in stock
         PieData = ValueInStock.Select(x => (double)x.Price).ToArray();
         PieLabels = ValueInStock.Select(x => x.CategoryName).ToArray();
+
+        //pie para entry per category
+        PieDataEntries = EntryPerCategory.Select(x => (double)x.NumberMovements).ToArray();
+        PieLabelsEntries = EntryPerCategory.Select(x => x.CategoryName).ToArray();
+
+        //pie para exit per category
+        PieDataExits = ExitPerCategory.Select(x => (double)x.NumberMovements).ToArray();
+        PieLabelsExits = ExitPerCategory.Select(x => x.CategoryName).ToArray();
     }
 
     //pagination
     private void PageChanged(int i)
     {
-        StockValueQuantityTable.NavigateTo(i-1);
+        StockValueQuantityTable.NavigateTo(i - 1);
     }
 }
