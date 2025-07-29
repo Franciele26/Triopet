@@ -7,18 +7,18 @@
 @using MudBlazor
 
 <PageTitle>Entries</PageTitle>
+<MudPopoverProvider />
 
 <MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center">
-    List of Entries 
+    List of Entries
 </MudText>
 <div class="list-group">
     <MudSnackbarProvider />
     <MudTable @ref="@EntryTable" Items="@Entry" Hover="true" Breakpoint="Breakpoint.Sm"
               Loading="@_loading" LoadingProgressColor="Color.Primary" RowsPerPage="6">
         <HeaderContent>
-            <MudTh>Id</MudTh>
-            <MudTh>Date</MudTh>
-            <MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<EntryDto, object>(e => e.DateOfEntry)">Date</MudTableSortLabel></MudTh>
+            <MudTh Class="d-flex align-items-center justify-content-center">
                 <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
                            StartIcon="@Icons.Material.Filled.Add"
                            OnClick="@OnAddEntry">
@@ -27,9 +27,8 @@
             </MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
             <MudTd DataLabel="Date">@context.DateOfEntry</MudTd>
-            <MudTd DataLabel="Actions">
+            <MudTd DataLabel="Actions" Class="d-flex align-items-center justify-content-center">
                 <MudIconButton @onclick="() => OnViewEntries(context.Id)"
                                Variant="Variant.Filled" Icon="@Icons.Material.Outlined.Visibility" Color="Color.Warning"
                                aria-label="Detail">
