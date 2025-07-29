@@ -36,7 +36,7 @@
         <div class="form-group">
             <label>Reason:</label>
             <select class="form-control" @bind="NewExit.ReasonId">
-                <option value="">Selecione um motivo</option>
+                <option value="">Select a motif</option>
                 @foreach (var reason in Reasons)
                 {
                     <option value="@reason.Id">@reason.Reason</option>
@@ -60,7 +60,7 @@
         <div class="form-group">
             <label>Product:</label>
             <select class="form-control" @bind="List.ProductId">
-                <option value="">Selecione um produto</option>
+                <option value="">Select a product</option>
                 @foreach (var prod in FilteredProducts)
                 {
                     <option value="@prod.Id">@prod.Name</option>
@@ -78,19 +78,19 @@
 
         <nav class="mt-3 d-flex align-items-center">
             <button class="btn btn-primary" type="submit">@buttonText</button>
-            <button @onclick="Voltar" type="button" class="btn btn-secondary ms-2">Back</button>
+            <button @onclick="Voltar" type="button" class="btn btn-secondary ms-2">Return</button>
         </nav>
 
         @if (NewExit.ProductExitDtos.Any())
         {
-            <h5 class="mt-4">Produtos adicionados:</h5>
+            <h5 class="mt-4">Added products:</h5>
             <ul>
                 @foreach (var p in NewExit.ProductExitDtos)
                 {
-                    var productName = Products.FirstOrDefault(x => x.Id == p.ProductId)?.Name ?? "Desconhecido";
+                    var productName = Products.FirstOrDefault(x => x.Id == p.ProductId)?.Name ?? "Unknown";
                     <li>
-                        @productName - Quantidade: @p.Quantity
-                        <button class="btn btn-sm btn-danger ms-2" @onclick="() => RemoveProduct(p)">Remover</button>
+                        @productName - Quantity: @p.Quantity
+                        <button class="btn btn-sm btn-danger ms-2" @onclick="() => RemoveProduct(p)">Remove</button>
                     </li>
                 }
             </ul>
@@ -164,7 +164,7 @@
     {
         if (!NewExit.ProductExitDtos.Any())
         {
-            Snackbar.Add("Tens de adicionar pelo menos um produto!", Severity.Error);
+            Snackbar.Add("You need to add at least one product!", Severity.Error);
             return;
         }
 
@@ -174,11 +174,11 @@
 
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Saída atualizada com sucesso!", Severity.Success);
+                Snackbar.Add("Exit was created successfully!!", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Erro ao atualizar saída", Severity.Error);
+                Snackbar.Add("Error when trying to create an exit", Severity.Error);
             }
         }
         else
@@ -186,12 +186,12 @@
             var response = await ApiService.CreateNewExit(NewExit);
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Saída registrada com sucesso!", Severity.Success);
+                Snackbar.Add("Exit was successfully registered!", Severity.Success);
                 NewExit = new ExitDto();
             }
             else
             {
-                Snackbar.Add("Erro ao registrar saída", Severity.Error);
+                Snackbar.Add("Error when trying to register an exit", Severity.Error);
             }
         }
     }

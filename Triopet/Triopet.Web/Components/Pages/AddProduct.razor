@@ -37,7 +37,7 @@ else
     <div class="form-group">
         <label>Category:</label>
         <select class="form-control" @bind="NewProduct.CategoryId">
-            <option value="">Select the category</option>
+            <option value="">Select a category</option>
             @foreach (var cat in Categorias)
             {
                 <option value="@cat.Id">@cat.Category</option>
@@ -48,7 +48,8 @@ else
     <div class="form-group">
         <label>Animal Type:</label>
         <select class="form-control" @bind="NewProduct.AnimalTypeId">
-            <option value="">Select the animal type</option>
+
+            <option value="">Select a type of animal</option>
             @foreach (var type in AnimalTypes)
             {
                 <option value="@type.Id">@type.AnimalType</option>
@@ -74,7 +75,7 @@ else
 
     <nav aria-label="Ações do produto" class="mt-3">
         <button class="btn btn-primary" type="submit">@buttonText</button>
-        <button @onclick="Voltar" type="button" class="btn btn-secondary mt-2 ms-2">Back</button>
+        <button @onclick="Voltar" type="button" class="btn btn-secondary mt-2 ms-2">Return</button>
         <button @onclick="AdicionarImagem" type="button" class="btn btn-secondary mt-2">Add Image</button>
     </nav>
 
@@ -99,7 +100,7 @@ else
             </ul>
         </div>
     }
-    <h6>Impossivel de remover, se houver uma unica imagem, em caso de erro. Acrescenta uma nova imagem e remove a errada</h6>
+    <h6>Error: If there's only one image available, you will be unable to remove it, please add another image, in order to remove the incorrect one.</h6>
 </div>
 @if (!string.IsNullOrEmpty(Mensagem))
 {
@@ -157,11 +158,11 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Produto atualizado com sucesso!", Severity.Success);
+                Snackbar.Add("Product was successfully updated!", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Erro ao atualizar produto", Severity.Success);
+                Snackbar.Add("Error when trying to update a product", Severity.Success);
             }
         }
         else
@@ -169,13 +170,13 @@ else
             var response = await ApiService.AddProductAsync(NewProduct);
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Produto adicionado com sucesso!", Severity.Success);
+                Snackbar.Add("Product was successfully added!", Severity.Success);
                 ImagensTemporarias.Clear();
                 NewProduct = new ProductDto();
             }
             else
             {
-                Snackbar.Add("Erro ao adicionar produto", Severity.Error);
+                Snackbar.Add("Error when trying to add a product", Severity.Error);
             }
         }
     }
@@ -202,18 +203,18 @@ else
             if (response.IsSuccessStatusCode)
             {
                 ImagensTemporarias.Remove(imagem);
-                Snackbar.Add("Imagem removida com sucesso!", Severity.Success);
+                Snackbar.Add("Image was successfully removed!", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Erro ao remover imagem.", Severity.Error);
+                Snackbar.Add("Error when trying to remove an image.", Severity.Error);
             }
         }
         else
         {
             // Imagem temporária, só remover localmente
             ImagensTemporarias.Remove(imagem);
-            Snackbar.Add("Imagem removida localmente.", Severity.Info);
+            Snackbar.Add("Image was removed locally.", Severity.Info);
         }
     }
 }
