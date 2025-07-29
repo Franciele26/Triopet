@@ -10,11 +10,15 @@
 
 @if (Id > 0)
 {
-    <h3>Edit Product</h3>
+    <MudText Typo="Typo.h4" GutterBottom="true">
+        Edit Product
+    </MudText>
 }
 else
 {
-    <h3>Add Product</h3>
+    <MudText Typo="Typo.h4" GutterBottom="true">
+        Add Product
+    </MudText>
 }
 
 <EditForm Model="NewProduct" OnValidSubmit="OnAddProduct">
@@ -65,7 +69,7 @@ else
     <div class="form-group">
         <label>Image URL:</label>
         <input type="text" @bind="NovaImagemUrl" class="form-control" />
-    </div>  
+    </div>
 
 
     <nav aria-label="Ações do produto" class="mt-3">

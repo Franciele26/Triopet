@@ -8,9 +8,11 @@
 
 <PageTitle>Exits</PageTitle>
 
-<h1>ExitList</h1>
+<MudText Typo="Typo.h3" Align="Align.Center" Class="mb-4">
+    List of Exits
+</MudText>
 
-<div class="exit-list mt-3">
+<div class="exit-list">
     <MudSnackbarProvider />
     <MudTable @ref="@ExitTable"
               Items="@Exits" Hover="true" Breakpoint="Breakpoint.Md"
@@ -45,8 +47,7 @@
         </RowTemplate>
         <PagerContent>
             <MudPagination SelectedChanged="OnPageChanged" Count="@((ExitTable.GetFilteredItemsCount() + ExitTable.RowsPerPage - 1) / ExitTable.RowsPerPage)"
-                           Class="pa-4"
-                           />
+                           Class="pa-4" />
         </PagerContent>
     </MudTable>
 
