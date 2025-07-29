@@ -2,3 +2,15 @@
     stroke: #444 !important; /* cor cinzenta escura */
     stroke-width: 1 !important; /* traço mais visível */
 }
+
+.page{
+    height: 100%;
+}
+
+.loadingDiv {
+    height: 50vh;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

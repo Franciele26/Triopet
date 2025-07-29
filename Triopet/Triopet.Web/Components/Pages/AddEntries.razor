@@ -10,11 +10,15 @@
 
 @if (Id > 0)
 {
-    <h3>Edit Entry</h3>
+    <MudText Typo="Typo.h4" GutterBottom="true">
+        Edit Entry
+    </MudText>
 }
 else
 {
-    <h3>Add Entry</h3>
+<MudText Typo="Typo.h4" GutterBottom="true">
+    Add Entry
+</MudText>
 }
 
 <EditForm Model="NewEntry" OnValidSubmit="OnAddEntry">
@@ -56,13 +60,13 @@ else
         <input type="number" @bind="List.PriceUnitOfEntry" class="form-control" />
 
     </div>
-    <button type="button" class="btn btn-success mt-2" @onclick="AddProductToList">Add product</button>
-    
-    
-    
+    <button type="button" class="btn btn-success mt-5" @onclick="AddProductToList">Add product</button>
+
+
+
     <nav class="mt-3">
         <button class="btn btn-primary" type="submit">@buttonText</button>
-        <button @onclick="Return" type="button" class="btn btn-secondary mt-2 ms-2">Return</button>
+        <button @onclick="Return" type="button" class="btn btn-secondary ms-2">Return</button>
     </nav>
 
     @if (NewEntry.ProductEntries.Any())
@@ -163,7 +167,7 @@ else
         }
     }
 
-   private void EditarProduto()
+    private void EditarProduto()
     {
         NavigationManager.NavigateTo($"/editproduct/{Id}");
     }
@@ -180,7 +184,7 @@ else
 
     private void AddProductToList()
     {
-        if (List.ProductId > 0 && List.Quantity > 0 && List.PriceUnitOfEntry>0)
+        if (List.ProductId > 0 && List.Quantity > 0 && List.PriceUnitOfEntry > 0)
         {
             // Evitar duplicados
             var existing = NewEntry.ProductEntries.FirstOrDefault(x => x.ProductId == List.ProductId);
@@ -202,5 +206,5 @@ else
             List = new ProductEntryDto(); // Limpar campos
         }
     }
- 
+
 }
