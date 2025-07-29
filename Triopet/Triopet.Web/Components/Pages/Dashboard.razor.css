@@ -1,0 +1,4 @@
+﻿.mud-charts-gridlines-yaxis path {
+    stroke: #444 !important; /* cor cinzenta escura */
+    stroke-width: 1 !important; /* traço mais visível */
+}
