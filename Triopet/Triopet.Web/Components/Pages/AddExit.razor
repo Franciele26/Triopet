@@ -87,7 +87,7 @@
             <ul>
                 @foreach (var p in NewExit.ProductExitDtos)
                 {
-                    var productName = Products.FirstOrDefault(x => x.Id == p.ProductId)?.Name ?? "Desconhecido";
+                    var productName = Products.FirstOrDefault(x => x.Id == p.ProductId)?.Name ?? "Unknown";
                     <li>
                         @productName - Quantidade: @p.Quantity
                         <button class="btn btn-sm btn-danger ms-2" @onclick="() => RemoveProduct(p)">Remover</button>
@@ -164,7 +164,7 @@
     {
         if (!NewExit.ProductExitDtos.Any())
         {
-            Snackbar.Add("Tens de adicionar pelo menos um produto!", Severity.Error);
+            Snackbar.Add("You have to add a product to continue!", Severity.Error);
             return;
         }
 
@@ -174,11 +174,11 @@
 
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Saída atualizada com sucesso!", Severity.Success);
+                Snackbar.Add("Exit updated with success!", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Erro ao atualizar saída", Severity.Error);
+                Snackbar.Add("Error trying to update this exit", Severity.Error);
             }
         }
         else
@@ -186,12 +186,12 @@
             var response = await ApiService.CreateNewExit(NewExit);
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Saída registrada com sucesso!", Severity.Success);
+                Snackbar.Add("Exit created with success!", Severity.Success);
                 NewExit = new ExitDto();
             }
             else
             {
-                Snackbar.Add("Erro ao registrar saída", Severity.Error);
+                Snackbar.Add("Error trying to create this exit", Severity.Error);
             }
         }
     }

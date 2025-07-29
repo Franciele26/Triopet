@@ -157,11 +157,11 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Produto atualizado com sucesso!", Severity.Success);
+                Snackbar.Add("Product updated with success", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Erro ao atualizar produto", Severity.Success);
+                Snackbar.Add("Error trying to update this product", Severity.Success);
             }
         }
         else
@@ -169,13 +169,13 @@ else
             var response = await ApiService.AddProductAsync(NewProduct);
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Produto adicionado com sucesso!", Severity.Success);
+                Snackbar.Add("Product created with success!", Severity.Success);
                 ImagensTemporarias.Clear();
                 NewProduct = new ProductDto();
             }
             else
             {
-                Snackbar.Add("Erro ao adicionar produto", Severity.Error);
+                Snackbar.Add("Error when trying to create this product", Severity.Error);
             }
         }
     }
@@ -202,18 +202,18 @@ else
             if (response.IsSuccessStatusCode)
             {
                 ImagensTemporarias.Remove(imagem);
-                Snackbar.Add("Imagem removida com sucesso!", Severity.Success);
+                Snackbar.Add("Image removed with success!", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Erro ao remover imagem.", Severity.Error);
+                Snackbar.Add("Erro when trying to remove this image.", Severity.Error);
             }
         }
         else
         {
             // Imagem temporária, só remover localmente
             ImagensTemporarias.Remove(imagem);
-            Snackbar.Add("Imagem removida localmente.", Severity.Info);
+            Snackbar.Add("Image removed localy.", Severity.Info);
         }
     }
 }
