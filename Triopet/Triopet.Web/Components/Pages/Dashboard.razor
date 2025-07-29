@@ -14,7 +14,7 @@
     @if (_loading)
     {
         <div class="loadingDiv">
-            <MudProgressCircular Color="Color.Info" Indeterminate="true" Size="Size.Large"/>
+            <MudProgressCircular Color="Color.Info" Indeterminate="true" Size="Size.Large" />
         </div>
     }
     else
@@ -58,14 +58,12 @@
                       Items="@LowStockProducts" Hover="true" Breakpoint="Breakpoint.Md"
                       Loading="@_loading" LoadingProgressColor="Color.Primary">
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(n => n.Name)">Name </MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(c => c.Category.Category)">Category</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(at => at.AnimalType.AnimalType)">Animal Type</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(q => q.QUantity)">Quantity</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Id">@context.Id</MudTd>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Category">@context.Category.Category</MudTd>
                     <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
@@ -86,14 +84,12 @@
                       Items="@TopFiveMovemens" Hover="true" Breakpoint="Breakpoint.Md"
                       Loading="@_loading" LoadingProgressColor="Color.Primary">
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(n => n.Name)">Name </MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(c => c.Category.Category)">Category</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(at => at.AnimalType.AnimalType)">Animal Type</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(tm => tm.TotalMovements)">Total de Movimentos</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Id">@context.Id</MudTd>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Category">@context.Category.Category</MudTd>
                     <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
@@ -105,6 +101,8 @@
         <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
 
         @*Placement for topSoldItems top 3,bar chart*@
+        @*Meter tabela de numero de vendas*@
+
         <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
             <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
                 Top Sold Items per Category
@@ -256,7 +254,6 @@
                       Loading="@_loading" LoadingProgressColor="Color.Primary"
                       RowsPerPage="10">
                 <HeaderContent>
-                    <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(x => x.Id)">Id</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(n => n.Name)">Name </MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(c => c.Category.Category)">Category</MudTableSortLabel></MudTh>
                     <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(at => at.AnimalType.AnimalType)">Animal Type</MudTableSortLabel></MudTh>
@@ -265,7 +262,6 @@
                     <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(x => x.Quantity * x.PricePerUnit)">Total Price</MudTableSortLabel></MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    <MudTd DataLabel="Id">@context.Id</MudTd>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Category">@context.Category.Category</MudTd>
                     <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
