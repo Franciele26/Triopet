@@ -158,7 +158,7 @@ else
 
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Product was successfully updated!", Severity.Success);
+                Snackbar.Add("Product updated with success", Severity.Success);
             }
             else
             {
@@ -170,13 +170,13 @@ else
             var response = await ApiService.AddProductAsync(NewProduct);
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Product was successfully added!", Severity.Success);
+                Snackbar.Add("Product created with success!", Severity.Success);
                 ImagensTemporarias.Clear();
                 NewProduct = new ProductDto();
             }
             else
             {
-                Snackbar.Add("Error when trying to add a product", Severity.Error);
+                Snackbar.Add("Error when trying to create this product", Severity.Error);
             }
         }
     }
