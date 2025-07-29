@@ -25,6 +25,18 @@
                 <MudText Typo="Typo.h5">@LowStockProducts.Count</MudText>
             </MudPaper>
         </MudItem>
+        <MudItem xs="12" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6">Total Entries</MudText>
+                <MudText Typo="Typo.h5">@TotalEntries</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" md="3">
+            <MudPaper Class="pa-4" Elevation="2">
+                <MudText Typo="Typo.h6">Total Exits</MudText>
+                <MudText Typo="Typo.h5">@TotalExits</MudText>
+            </MudPaper>
+        </MudItem>
     </MudGrid>
 
     @*Placement for lowstock prodcuts*@
@@ -76,6 +88,7 @@
             </RowTemplate>
         </MudTable>
     </MudContainer>
+    <h1>Teste CSS</h1>
 
     @*Placement for topSoldItems top 3,bar chart*@
     <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
@@ -90,7 +103,7 @@
         }
         else
         {
-            <MudStack Row="false" Class="mt-5">
+            <MudStack Row="false" Class="bar-chart mt-5">
                 <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
                     <option value="0">Select a category</option>
                     @foreach (var item in Categories)
@@ -98,11 +111,10 @@
                         <option value="@item.Id">@item.Category</option>
                     }
                 </select>
-                <MudPaper Class="chart-container" style="background-color:whitesmoke;
-                    display: flex; justify-content: center; align-items: center; width: 100%;">
+                <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center; width: 100%;">
                     <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
                               XAxisLabels="@_xAxisLabels"
-                              Width="90%" Height="50vh" />
+                              Width="90%" Height="50vh" Style="background:#ffffffd2" />
                 </MudPaper>
             </MudStack>
         }
@@ -132,11 +144,11 @@
                 </MudText>
             </MudItem>
             <MudItem xs="12" md="6">
-                <MudPaper Class="pa-4">
+                <MudPaper Class="pa-4 d-flex justify-content-center align-content-center">
                     <MudChart ChartType="ChartType.Pie"
                               InputData="@PieData"
                               InputLabels="@PieLabels"
-                              Width="500px" Height="400px" />
+                              Width="80%" Height="80%" />
                 </MudPaper>
             </MudItem>
         </MudGrid>
@@ -150,11 +162,11 @@
         </MudText>
         <MudGrid>
             <MudItem xs="12" md="6">
-                <MudPaper Class="pa-4">
+                <MudPaper Class="pa-4 d-flex justify-content-center align-content-center">
                     <MudChart ChartType="ChartType.Pie"
                               InputData="@PieDataEntries"
                               InputLabels="@PieLabelsEntries"
-                              Width="500px" Height="400px" />
+                              Width="80%" Height="80%" />
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" md="6">
@@ -182,11 +194,11 @@
         </MudText>
         <MudGrid>
             <MudItem xs="12" md="6">
-                <MudPaper Class="pa-4">
+                <MudPaper Class="pa-4 d-flex justify-content-center align-content-center">
                     <MudChart ChartType="ChartType.Pie"
                               InputData="@PieDataExits"
                               InputLabels="@PieLabelsExits"
-                              Width="500px" Height="400px" />
+                              Width="80%" Height="80%" />
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" md="6">
@@ -243,8 +255,11 @@
             </PagerContent>
         </MudTable>
     </MudContainer>
-
+    <MudScrollToTop Style="bottom: 1%; right: 0;">
+        <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward" />
+    </MudScrollToTop>
 </div>
+
 
 @code
 {
@@ -265,6 +280,9 @@
     private MudTable<ProductStockQuantityPerCategoryDto> StockValueQuantityTable = new();
 
     private decimal TotalStockValue => ValueInStock.Sum(x => x.Price);
+    private int TotalEntries => EntryPerCategory?.Sum(e => e.NumberMovements) ?? 0;
+    private int TotalExits => ExitPerCategory?.Sum(e => e.NumberMovements) ?? 0;
+
     //private decimal TotalPriceStockPerProduct => StockValueQuantity.Sum(x => x.Quantity * x.PricePerUnit);
 
 
