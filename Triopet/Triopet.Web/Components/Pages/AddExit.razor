@@ -174,11 +174,11 @@
 
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Exit was created successfully!!", Severity.Success);
+                Snackbar.Add("Exit updated with success!", Severity.Success);
             }
             else
             {
-                Snackbar.Add("Error when trying to create an exit", Severity.Error);
+                Snackbar.Add("Error trying to update this exit", Severity.Error);
             }
         }
         else
@@ -186,12 +186,12 @@
             var response = await ApiService.CreateNewExit(NewExit);
             if (response.IsSuccessStatusCode)
             {
-                Snackbar.Add("Exit was successfully registered!", Severity.Success);
+                Snackbar.Add("Exit created with success!", Severity.Success);
                 NewExit = new ExitDto();
             }
             else
             {
-                Snackbar.Add("Error when trying to register an exit", Severity.Error);
+                Snackbar.Add("Error trying to create this exit", Severity.Error);
             }
         }
     }
