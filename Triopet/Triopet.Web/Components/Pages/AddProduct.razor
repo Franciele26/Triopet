@@ -37,7 +37,7 @@ else
     <div class="form-group">
         <label>Category:</label>
         <select class="form-control" @bind="NewProduct.CategoryId">
-            <option value="">Selecione uma categoria</option>
+            <option value="">Select the category</option>
             @foreach (var cat in Categorias)
             {
                 <option value="@cat.Id">@cat.Category</option>
@@ -48,7 +48,7 @@ else
     <div class="form-group">
         <label>Animal Type:</label>
         <select class="form-control" @bind="NewProduct.AnimalTypeId">
-            <option value="">Selecione um tipo de animal</option>
+            <option value="">Select the animal type</option>
             @foreach (var type in AnimalTypes)
             {
                 <option value="@type.Id">@type.AnimalType</option>
@@ -68,7 +68,7 @@ else
 
     <div class="form-group">
         <label>Image URL:</label>
-        <input type="text" @bind="NovaImagemUrl" class="form-control" />
+        <input type="text" @bind="NovaImagemUrl" class="form-control" style="overflow-x: auto; white-space: nowrap;" />
     </div>
 
 
@@ -89,7 +89,9 @@ else
                 @foreach (var img in ImagensTemporarias)
                 {
                     <li>
-                        @img.Url
+                        <div style="overflow-x: auto; white-space: nowrap; max-width: 60vw;">
+                            @img.Url
+                        </div>                        
                         <button class="btn btn-danger btn-sm ms-2" @onclick="async () => await RemoverImagem(img)">Remove</button>
 
                     </li>
