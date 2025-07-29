@@ -8,15 +8,19 @@
 
 <MudSnackbarProvider />
 
-<div style="background-color: #e0e0e0; min-height: 100vh; padding: 30px;">
+<div>
 
     @if (Id > 0)
     {
-        <h3>Edit Exit</h3>
+        <MudText Typo="Typo.h4" GutterBottom="true">
+            Edit Exit
+        </MudText>
     }
     else
     {
-        <h3>Add Exit</h3>
+        <MudText Typo="Typo.h4" GutterBottom="true">
+            Add Exit
+        </MudText>
     }
 
     <EditForm Model="NewExit" OnValidSubmit="OnAddExit">
@@ -67,13 +71,14 @@
             <input type="number" class="form-control" @bind="List.Quantity" />
 
 
-            <button type="button" class="btn btn-success mt-2" @onclick="AddProductToList">Add Product</button>
-@*             <button type="button" class="btn btn-success mt-2" @onclick="EditarProduto">Editar</button>
- *@        </div>
+            <button type="button" class="btn btn-success mt-5" @onclick="AddProductToList">Add Product</button>
+            @*             <button type="button" class="btn btn-success mt-2" @onclick="EditarProduto">Editar</button>
+            *@
+        </div>
 
-        <nav class="mt-3">
+        <nav class="mt-3 d-flex align-items-center">
             <button class="btn btn-primary" type="submit">@buttonText</button>
-            <button @onclick="Voltar" type="button" class="btn btn-secondary mt-2 ms-2">Back</button>
+            <button @onclick="Voltar" type="button" class="btn btn-secondary ms-2">Back</button>
         </nav>
 
         @if (NewExit.ProductExitDtos.Any())
@@ -220,4 +225,4 @@
         }
     }
 
- }
+}
