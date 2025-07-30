@@ -149,9 +149,17 @@ namespace Triopet.Api.Controllers
         [HttpPost("/exits")]
         public async Task<IActionResult> AddNewExitAction([FromBody] ExitDto exitDto)
         {
+            var today = DateTime.Now;
+            var minDate = today.AddDays(-21);
             if (exitDto == null)
             {
                 return BadRequest("Error trying to create the exitDto");
+            }
+
+            if(exitDto.DateOfExit < minDate || exitDto.DateOfExit > today)
+            {
+                return BadRequest("Invalid date: the selected date must be no later than today and no earlier than 21 days ago.");
+
             }
 
             var newExit = new Exit
@@ -168,10 +176,10 @@ namespace Triopet.Api.Controllers
             {
                 var product = await _businessContext.Products.FindAsync(pe.ProductId);
                 if (product == null)
-                    return NotFound($"Produto com ID {pe.ProductId} não encontrado.");
+                    return NotFound($"Produto Id: {pe.ProductId} not found.");
 
                 if (product.Quantity < pe.Quantity)
-                    return BadRequest($"Stock insuficiente para '{product.Name}'.");
+                    return BadRequest($"Not enough stock to make that exit for product: '{product.Name}'.");
 
                 product.Quantity -= pe.Quantity;
                 newExit.ProductExits.Add(new ProductExit
@@ -197,9 +205,18 @@ namespace Triopet.Api.Controllers
         [HttpPut("/exits")]
         public async Task<IActionResult> UpdateExits([FromBody] ExitDto exitDto)
         {
+            var today = DateTime.Now;
+            var minDate = today.AddDays(-21);
+
             if (exitDto.Id <= 0)
             {
                 return BadRequest("Error trying to find that exit log");
+            }
+
+            if (exitDto.DateOfExit < minDate || exitDto.DateOfExit > today)
+            {
+                return BadRequest("Invalid date: the selected date must be no later than today and no earlier than 21 days ago.");
+
             }
 
             var existingExitLog = await _businessContext.Exits
@@ -249,15 +266,6 @@ namespace Triopet.Api.Controllers
             foreach (var pe in exitDto.ProductExitDtos)
             {
                 var prod = await _businessContext.Products.FindAsync(pe.ProductId);
-                //if (prod == null)
-                //{
-                //    return NotFound($"Product {pe.ProductId} not found");
-                //}
-
-                //if (pe.Quantity < 0 || prod.Quantity < pe.Quantity)
-                //{
-                //    return BadRequest($"Error while editing stock for product '{prod.Name}'.");
-                //}
 
                 prod.Quantity -= pe.Quantity;
 
@@ -309,66 +317,18 @@ namespace Triopet.Api.Controllers
                 }
                 item.IsDeleted = true;
             }
-            /*
-             Se quisese remover os registos mesmo
-                // Remover os registos da tabela mista
-                _businessContext.ProductExits.RemoveRange(exit.ProductExits);
-
-                // Remover o Exit
-                _businessContext.Exits.Remove(exit);
-             */
-
-            //apagar o exit
             foundExit.IsDeleted = true;
             foundExit.UpdatedAt = DateTime.UtcNow;
 
             var response = await _businessContext.SaveChangesAsync(true);
             if (response > 0)
             {
-                return Ok($"Apagado com sucesso.\nResponse:{response}");
+                return Ok($"Deleted with success.\nResponse:{response}");
             }
             else
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete exit");
             }
         }
-
-        //[HttpDelete("/exits/{exitId}/products/{productId}")]
-        //public async Task<IActionResult> DeleteProductFromExit(int exitId, int productId)
-        //{
-        //    var exit = await _businessContext.Exits
-        //        .Include(e => e.ProductExits.Where(ep => !ep.IsDeleted))
-        //        .FirstOrDefaultAsync(e => e.Id == exitId && !e.IsDeleted);
-
-        //    if (exit == null)
-        //    {
-        //        return NotFound("Exit not found.");
-        //    }
-
-        //    var productExit = exit.ProductExits.FirstOrDefault(pe => pe.ProductId == productId);
-        //    if (productExit == null)
-        //    {
-        //        return NotFound("Product not found in this exit.");
-        //    }
-        //    // devolver stock
-        //    var product = await _businessContext.Products.FindAsync(productId);
-        //    if (product != null)
-        //    {
-        //        product.Quantity += productExit.Quantity;
-        //    }
-        //    //exit.ProductExits.Remove(productExit);
-        //    productExit.IsDeleted = true;
-        //    exit.UpdatedAt = DateTime.UtcNow;
-
-        //    var result = await _businessContext.SaveChangesAsync(true);
-        //    if (result > 0)
-        //    {
-        //        return Ok();
-        //    }
-        //    else
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error trying to delete exit");
-        //    }
-        //}
     }
 }

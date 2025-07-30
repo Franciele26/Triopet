@@ -139,14 +139,24 @@ namespace Triopet.Api.Controllers
         [HttpPost("/entries")]
         public async Task<IActionResult> AddNewEntry([FromBody] EntryDto entryDto)
         {
+
+            var today = DateTime.Now;
+            var minDate = today.AddDays(-14);
+            var maxDate = today.AddDays(7);
+
             if (entryDto == null)
             {
                 return BadRequest("Error trying to create the entryDto");
             }
 
+            if (entryDto.DateOfEntry < minDate || entryDto.DateOfEntry > maxDate)
+            {
+                return BadRequest($"Invalid date: the selected date must be in between min: {minDate} and max {maxDate}");
+            }
+
             var newEntry = new Entry
             {
-                EntryDate = DateTime.UtcNow,
+                EntryDate = entryDto.DateOfEntry,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 IsDeleted = false,
@@ -157,11 +167,11 @@ namespace Triopet.Api.Controllers
             {
                 var product = await _businessContext.Products.FindAsync(pe.ProductId);
                 if (product == null)
-                    return NotFound($"Produto com ID {pe.ProductId} não encontrado.");
+                    return NotFound($"Produt ID: {pe.ProductId} not found.");
 
                 if (pe.Quantity < 0)
                 {
-                    return BadRequest($"Impossivel adicionar se for menor que 0, '{product.Name}'.");
+                    return BadRequest($"Impossible to add a product with less then 0 quantity, '{product.Name}'.");
                 }
                 product.Quantity += pe.Quantity;
                 newEntry.ProductEntries.Add(new ProductEntry
@@ -177,7 +187,7 @@ namespace Triopet.Api.Controllers
 
             if (response > 0)
             {
-                return Ok("Produto adicionado com sucesso");
+                return Ok("Produt added with success");
             }
             else
             {
@@ -220,7 +230,7 @@ namespace Triopet.Api.Controllers
             var response = await _businessContext.SaveChangesAsync(true);
             if (response > 0)
             {
-                return Ok($"Apagado com sucesso.\nResponse:{response}");
+                return Ok($"Products deleted with success.\nResponse:{response}");
             }
             else
             {
@@ -273,7 +283,7 @@ namespace Triopet.Api.Controllers
                     return BadRequest($"Impossible to add negative numbers to stock for product '{prod.Name}'.");
 
                 if (pe.PriceUnitOfEntry < 0)
-                    return BadRequest($"Impossible to add negative numbers to stock for product '{prod.Name}'.");
+                    return BadRequest($"Impossible to add a product with negative value '{prod.Name}'.");
 
                 prod.Quantity += pe.Quantity;
 

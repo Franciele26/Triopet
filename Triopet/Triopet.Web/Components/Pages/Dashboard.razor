@@ -177,7 +177,7 @@
             categorias para entrada*@
         <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
             <MudText Class="EntriesPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
-                Number of Entries per Category
+                Number of Entries per Category in the last 7 days
             </MudText>
             <MudGrid>
                 <MudItem xs="12" md="6">
@@ -211,7 +211,7 @@
             categorias para saida*@
         <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
             <MudText Class="ExitsPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
-                Number of Exits per Category
+                Number of Exits per Category in the last 7 days
             </MudText>
             <MudGrid>
                 <MudItem xs="12" md="6">
@@ -302,6 +302,10 @@
     private MudTable<ProductStockQuantityPerCategoryDto> StockValueQuantityTable = new();
 
     private decimal TotalStockValue => ValueInStock.Sum(x => x.Price);
+
+    private DateTime SevenDaysAgo = DateTime.Now.AddDays(-7);
+
+
     private int TotalEntries => EntryPerCategory?.Sum(e => e.NumberMovements) ?? 0;
     private int TotalExits => ExitPerCategory?.Sum(e => e.NumberMovements) ?? 0;
 

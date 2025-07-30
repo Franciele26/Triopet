@@ -85,14 +85,14 @@ else
     @if (ImagensTemporarias.Count > 0)
     {
         <div class="mt-3">
-            <h5>Imagens adicionadas:</h5>
+            <h5>Image List:</h5>
             <ul>
                 @foreach (var img in ImagensTemporarias)
                 {
                     <li>
                         <div style="overflow-x: auto; white-space: nowrap; max-width: 60vw;">
                             @img.Url
-                        </div>                        
+                        </div>
                         <button class="btn btn-danger btn-sm ms-2" @onclick="async () => await RemoverImagem(img)">Remove</button>
 
                     </li>
@@ -100,12 +100,8 @@ else
             </ul>
         </div>
     }
-    <h6>Error: If there's only one image available, you will be unable to remove it, please add another image, in order to remove the incorrect one.</h6>
 </div>
-@if (!string.IsNullOrEmpty(Mensagem))
-{
-    <p class="text-success mt-3">@Mensagem</p>
-}
+
 
 @code {
     [Parameter]
@@ -120,7 +116,7 @@ else
 
     public ProductDto NewProduct = new();
 
-    private string Mensagem = string.Empty;
+    private string errorMsg = string.Empty;
     private string NovaImagemUrl;
 
 
@@ -162,7 +158,8 @@ else
             }
             else
             {
-                Snackbar.Add("Error when trying to update a product", Severity.Success);
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
         else
@@ -176,7 +173,8 @@ else
             }
             else
             {
-                Snackbar.Add("Error when trying to create this product", Severity.Error);
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
     }
@@ -207,7 +205,8 @@ else
             }
             else
             {
-                Snackbar.Add("Error when trying to remove an image.", Severity.Error);
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
         else

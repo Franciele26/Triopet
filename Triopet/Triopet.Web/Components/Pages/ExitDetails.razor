@@ -85,6 +85,8 @@ else
     public int Id { get; set; }
     private ExitDto Exit { get; set; } = new();
     private bool loading { get; set; } = false;
+    private string errorMsg { get; set; } = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,7 +121,8 @@ else
         }
         else
         {
-            Snackbar.Add("Error when trying to erase an exit");
+            errorMsg = await responseDelete.Content.ReadAsStringAsync();
+            Snackbar.Add(errorMsg, Severity.Error);
         }
     }
 
