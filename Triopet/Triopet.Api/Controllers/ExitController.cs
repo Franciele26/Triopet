@@ -156,7 +156,7 @@ namespace Triopet.Api.Controllers
                 return BadRequest("Error trying to create the exitDto");
             }
 
-            if(exitDto.DateOfExit < minDate || exitDto.DateOfExit > today)
+            if (exitDto.DateOfExit < minDate || exitDto.DateOfExit > today)
             {
                 return BadRequest("Invalid date: the selected date must be no later than today and no earlier than 21 days ago.");
 
@@ -205,23 +205,31 @@ namespace Triopet.Api.Controllers
         [HttpPut("/exits")]
         public async Task<IActionResult> UpdateExits([FromBody] ExitDto exitDto)
         {
-            var today = DateTime.Now;
-            var minDate = today.AddDays(-21);
 
             if (exitDto.Id <= 0)
             {
                 return BadRequest("Error trying to find that exit log");
             }
 
-            if (exitDto.DateOfExit < minDate || exitDto.DateOfExit > today)
-            {
-                return BadRequest("Invalid date: the selected date must be no later than today and no earlier than 21 days ago.");
 
-            }
 
             var existingExitLog = await _businessContext.Exits
                 .Include(e => e.ProductExits)
                 .FirstOrDefaultAsync(e => e.Id == exitDto.Id);
+
+            var oldDate = existingExitLog.ExitDate;
+            var today = DateTime.Now;
+            var minDate = today.AddDays(-21);
+
+            if (exitDto.DateOfExit != oldDate)
+            {
+                if (exitDto.DateOfExit < minDate || exitDto.DateOfExit > today)
+                {
+                    return BadRequest("Invalid date: the selected date must be no later than today and no earlier than 21 days ago.");
+
+                }
+            }
+
 
             if (existingExitLog == null)
             {
@@ -251,7 +259,7 @@ namespace Triopet.Api.Controllers
                 if (prod.Quantity < pe.Quantity)
                     return BadRequest($"Stock too low for product '{prod.Name}'. Available: {prod.Quantity}, requested: {pe.Quantity}");
             }
-        
+
 
             //atualizar os dados
 

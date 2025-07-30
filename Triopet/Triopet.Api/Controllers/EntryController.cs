@@ -250,6 +250,20 @@ namespace Triopet.Api.Controllers
                 .Include(e => e.ProductEntries)
                 .FirstOrDefaultAsync(e => e.Id == entryDto.Id);
 
+            var oldDate = existingEntryLog.EntryDate;
+
+            var today = DateTime.Now;
+            var minDate = today.AddDays(-14);
+            var maxDate = today.AddDays(7);
+
+            if (entryDto.DateOfEntry != oldDate)
+            {
+                if (entryDto.DateOfEntry < minDate || entryDto.DateOfEntry > maxDate)
+                {
+                    return BadRequest($"Invalid date: the selected date must be in between min: {minDate} and max {maxDate}");
+                }
+            }
+
             if (existingEntryLog == null)
             {
                 return NotFound("Entry log not found");
