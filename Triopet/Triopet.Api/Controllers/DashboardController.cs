@@ -235,6 +235,8 @@ namespace Triopet.Api.Controllers
         [HttpGet("/exitsPerCategory")]
         public async Task<IActionResult> ExitsPerCategory()//nao sei, tem de mostrar nome, preço, para cada e um total
         {
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+
             //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
             var exitsPerCategory = await _businessContext.ProductExits
                 .Include(pe => pe.Product)
@@ -248,6 +250,47 @@ namespace Triopet.Api.Controllers
                 }).ToListAsync();
 
             return Ok(exitsPerCategory);
+        }
+
+        [HttpGet("/sevenLastDaysEntries")]
+        public async Task<IActionResult> SevenLastDaysEntries()//nao sei, tem de mostrar nome, preço, para cada e um total
+        {
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+            //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
+            var sevenLastDaysEntries = await _businessContext.ProductEntries
+                .Include(pe => pe.Product)
+                .ThenInclude(c => c.Category)
+                .Where(d => d.Entry.EntryDate >= sevenDaysAgo)
+                .GroupBy(pe => new { pe.Product.CategoryId, pe.Product.Category.CategoryName })
+                .Select(g => new MovementPerCategory
+                {
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = g.Key.CategoryName,
+                    NumberMovements = g.Count()
+                }).ToListAsync();
+
+            return Ok(sevenLastDaysEntries);
+        }
+
+        [HttpGet("/sevenLastDaysExits")]
+        public async Task<IActionResult> SevenLastDaysExits()//nao sei, tem de mostrar nome, preço, para cada e um total
+        {
+            var sevenDaysAgo = DateTime.Now.AddDays(-7);
+
+            //produtos -> categoria para nomes / agrupar em id e nome de cat e fazer a soma dos valores em stock
+            var SevenLastDaysExits = await _businessContext.ProductExits
+                .Include(pe => pe.Product)
+                .ThenInclude(c => c.Category)
+                 .Where(d => d.Exit.ExitDate <= sevenDaysAgo)
+                .GroupBy(pe => new { pe.Product.CategoryId, pe.Product.Category.CategoryName })
+                .Select(g => new MovementPerCategory
+                {
+                    CategoryId = g.Key.CategoryId,
+                    CategoryName = g.Key.CategoryName,
+                    NumberMovements = g.Count()
+                }).ToListAsync();
+
+            return Ok(SevenLastDaysExits);
         }
     }
 }

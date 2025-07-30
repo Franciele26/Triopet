@@ -31,7 +31,7 @@
             </MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Date">@context.DateOfExit</MudTd>
+            <MudTd DataLabel="Date">@context.DateOfExit.ToString("dd/MM/yyyy")</MudTd>
             <MudTd DataLabel="Motif">@context.Reason.Reason</MudTd>
             <MudTd DataLabel="Action" Class="d-flex align-items-center justify-content-center">
                 <MudIconButton @onclick="() => OnViewExits(context.Id)"
