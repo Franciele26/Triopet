@@ -1,7 +1,106 @@
 ﻿@page "/"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
+<div class="mx-4">
+    <MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center" Class="mb-5">
+        Products
+    </MudText>
 
-<h1>Hello, world!</h1>
+    @if (Produtos == null)
+    {
+        <div style="display: flex; justify-content: center; margin-top: 40px;">
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Medium" />
+        </div>
+    }
+    else if (!Produtos.Any())
+    {
+        <MudText Typo="Typo.subtitle1" Align="Align.Center">Nenhum produto encontrado.</MudText>
+    }
+    else
+    {
+        <MudGrid Gutter="3" Class="mt-10">
+            @foreach (var produto in PagedProdutos)
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudCard Style="background-color: white; border-radius: 16px; box-shadow: 0px 4px 12px rgba(0,0,0,0.1); height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
+                        <MudCard Class="m-2" Style="height: 200px;">
+                            <div style="display: flex; height: 100%;">
+                                <!-- Imagem à esquerda -->
+                                @if (produto.Images != null && produto.Images.Any())
+                                {
+                                    <div style="flex: 1; overflow: hidden; border-radius: 12px 0 0 12px;">
+                                        <MudImage Src="@produto.Images.First().Url"
+                                                  Alt="@produto.Name"
+                                                  Style="width: 100%; height: 100%; object-fit: cover;" />
+                                    </div>
+                                }
 
-Welcome to your new app.
+                                <!-- Texto à direita -->
+                                <div style="flex: 1; padding: 16px;">
+                                    <MudText Typo="Typo.h6" Style="word-break: break-word; overflow: hidden;
+                                    text-overflow: ellipsis; display:-webkit-box; -webkit-line-clamp: 3; -webkit-box-orient:vertical;">@produto.Name</MudText>
+                                    <MudText Typo="Typo.subtitle2">Qtd: @produto.Quantity</MudText>
+                                    <MudText Typo="Typo.caption" Style="color: gray;">Identificação: @produto.Id</MudText>
+                                </div>
+                            </div>
+                        </MudCard>
+                        <MudCardActions Class="p-0">
+                            <MudButton Variant="Variant.Filled"
+                                       Style="background-color: #d3d3d3; color: black; border-radius: 0px 0px 16px 16px; width: 100%; font-weight: bold;"
+                                       Href="@($"/productdetails/{produto.Id}")">
+                                Detalhes
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+        <MudPagination Count="@GetTotalPages()" Selected="@CurrentPage" SelectedChanged="OnPageChanged" Class="pa-4" />
+    }
+</div>
+@code {
+
+    private List<ProductDto> Produtos;
+    private int CurrentPage = 1;
+
+    private int currentPage
+    {
+        get => CurrentPage;
+        set
+        {
+            if (CurrentPage != value)
+            {
+                CurrentPage = value;
+            }
+            StateHasChanged();
+        }
+    }
+    private int ItemsPerPage = 9;
+    private IEnumerable<ProductDto> PagedProdutos =>
+    Produtos?.Skip((CurrentPage - 1) * ItemsPerPage).Take(ItemsPerPage) ?? Enumerable.Empty<ProductDto>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Produtos = await ApiService.GetProductsAsync();
+        Produtos = Produtos.OrderBy(p => p.Name).ToList();
+    }
+          
+    private int GetTotalPages()
+    {
+        if (Produtos == null || Produtos.Count == 0)
+        {
+            return 1;
+        }
+        return (int)Math.Ceiling((double)(Produtos?.Count ?? 0) / ItemsPerPage);
+    }
+          
+    private async Task OnPageChanged(int page)
+    {
+        CurrentPage = page;
+        StateHasChanged();
+    }
+}

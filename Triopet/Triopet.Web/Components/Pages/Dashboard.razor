@@ -1,0 +1,432 @@
+﻿@page "/dashboard"
+@inject IApiService ApiService
+@using Triopet.Shared.Models
+@using Triopet.Shared.Models.DashBoardDtos
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard</PageTitle>
+<MudPopoverProvider />
+
+<div class="page">
+    <MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center">
+        Dashboard
+    </MudText>
+    @if (_loading)
+    {
+        <div class="loadingDiv">
+            <MudProgressCircular Color="Color.Info" Indeterminate="true" Size="Size.Large" />
+        </div>
+    }
+    else
+    {
+        @*Zona para os cards, ascrecentar uns para total de entradas e total de saidas*@
+        <MudGrid Class="mt-5" Style="margin-bottom:5vh;" Justify="Justify.Center" Spacing="10">
+            <MudItem xs="12" md="3">
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Total Stock Value</MudText>
+                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@TotalStockValue.ToString("C")</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Low Stock Products</MudText>
+                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@LowStockProducts.Count</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Total Entries</MudText>
+                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@TotalEntries</MudText>
+                </MudPaper>
+            </MudItem>
+            <MudItem xs="12" md="3">
+                <MudPaper Class="pa-4" Elevation="2">
+                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Total Exits</MudText>
+                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@TotalExits</MudText>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
+
+        @*Placement for lowstock prodcuts*@
+        <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+            <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
+                Low Stock!!
+            </MudText>
+            <MudTable Class="mt-5" SortLabel="Sort By"
+                      Items="@LowStockProducts" Hover="true" Breakpoint="Breakpoint.Md"
+                      Loading="@_loading" LoadingProgressColor="Color.Primary">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(n => n.Name)">Name </MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(c => c.Category.Category)">Category</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(at => at.AnimalType.AnimalType)">Animal Type</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<LowStockProductsDto, object>(q => q.QUantity)">Quantity</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Category">@context.Category.Category</MudTd>
+                    <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
+                    <MudTd DataLabel="Quantity">@context.QUantity</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudContainer>
+
+        <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
+
+
+        @*Placement for top 5 movements*@
+        <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+            <MudText Class="topFiveMovements" Typo="Typo.h5" GutterBottom="true">
+                Top Five Movements
+            </MudText>
+            <MudTable Class="mt-5"
+                      Items="@TopFiveMovemens" Hover="true" Breakpoint="Breakpoint.Md"
+                      Loading="@_loading" LoadingProgressColor="Color.Primary">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(n => n.Name)">Name </MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(c => c.Category.Category)">Category</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(at => at.AnimalType.AnimalType)">Animal Type</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<TopFiveMovementDto, object>(tm => tm.TotalMovements)">Total de Movimentos</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Category">@context.Category.Category</MudTd>
+                    <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
+                    <MudTd DataLabel="Quantity">@context.TotalMovements</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudContainer>
+
+        <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
+
+        @*Placement for topSoldItems top 3,bar chart*@
+        @*Meter tabela de numero de vendas*@
+
+        <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+            <MudText Class="lowStock-container" Typo="Typo.h4" GutterBottom="true">
+                Top Sold Items per Category
+            </MudText>
+            @if (Categories.Count <= 0)
+            {
+                <MudText Class="lowStock-container mt-5" Typo="Typo.h4" GutterBottom="true">
+                    Error trying to get categories
+                </MudText>
+            }
+            else
+            {
+                <MudStack Row="false" Class="bar-chart mt-5">
+                    <MudStack Row="true" Style="align-items:center;">
+                        <MudText Typo="Typo.h6">Select a Category:</MudText>
+                        <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
+                            <option value="0">Select a category</option>
+                            @foreach (var item in Categories)
+                            {
+                                <option value="@item.Id">@item.Category</option>
+                            }
+                        </select>
+                    </MudStack>
+                    <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                        <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
+                                  XAxisLabels="@_xAxisLabels"
+                                  Width="90%" Height="50vh" Style="background:#ffffffd2" />
+                    </MudPaper>
+                </MudStack>
+            }
+        </MudContainer>
+
+        <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
+
+        @*Placement converter este para pie chart -> Dto a usar -> CategoryPricesDto mas usar o controlador que devolve a media*@
+        <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+            <MudText Class="CategoryPricesTitle mt-5" Typo="Typo.h4" GutterBottom="true">
+                Category Value in Stock
+            </MudText>
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudTable Items="@ValueInStock" Hover="true" Breakpoint="Breakpoint.Md"
+                              Loading="@_loading" LoadingProgressColor="Color.Primary"
+                              Style="border-color:transparent; margin-bottom:1vh">
+                        <HeaderContent>
+                            <MudTh>Category</MudTh>
+                            <MudTh>Value</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Category">@context.CategoryName</MudTd>
+                            <MudTd DataLabel="Value">@context.Price.ToString("c")</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                    <MudText Typo="Typo.h5" GutterBottom="true">
+                        Total in stock: @TotalStockValue.ToString("C")
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-4 d-flex justify-content-center align-content-center">
+                        <MudChart ChartType="ChartType.Pie"
+                                  InputData="@PieData"
+                                  InputLabels="@PieLabels"
+                                  Width="80%" Height="80%" />
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+
+        <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
+
+        @*Pie chart para movimentos e le categorias
+            categorias para entrada*@
+        <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+            <MudText Class="EntriesPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
+                Number of Entries per Category
+            </MudText>
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-4 d-flex justify-content-center align-content-center">
+                        <MudChart ChartType="ChartType.Pie"
+                                  InputData="@PieDataEntries"
+                                  InputLabels="@PieLabelsEntries"
+                                  Width="80%" Height="80%" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTable Items="@EntryPerCategory" Hover="true" Breakpoint="Breakpoint.Md"
+                              Loading="@_loading" LoadingProgressColor="Color.Primary"
+                              Style="border-color:transparent; margin-bottom:1vh">
+                        <HeaderContent>
+                            <MudTh>Category</MudTh>
+                            <MudTh>Total Entries</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Category">@context.CategoryName</MudTd>
+                            <MudTd DataLabel="TotalEntries">@context.NumberMovements</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+
+        <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
+
+        @*Pie chart para movimentos e le categorias
+            categorias para saida*@
+        <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+            <MudText Class="ExitsPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
+                Number of Exits per Category
+            </MudText>
+            <MudGrid>
+                <MudItem xs="12" md="6">
+                    <MudPaper Class="pa-4 d-flex justify-content-center align-content-center">
+                        <MudChart ChartType="ChartType.Pie"
+                                  InputData="@PieDataExits"
+                                  InputLabels="@PieLabelsExits"
+                                  Width="80%" Height="80%" />
+                    </MudPaper>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <MudTable Items="@ExitPerCategory" Hover="true" Breakpoint="Breakpoint.Md"
+                              Loading="@_loading" LoadingProgressColor="Color.Primary"
+                              Style="border-color:transparent; margin-bottom:1vh">
+                        <HeaderContent>
+                            <MudTh>Category</MudTh>
+                            <MudTh>Total Exits</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Category">@context.CategoryName</MudTd>
+                            <MudTd DataLabel="TotalEntries">@context.NumberMovements</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+
+        <MudDivider Class="mt-14 mb-10" Style="background-color: #000000; height: 0.4vh;"></MudDivider>
+
+        @*Placement for Stock - value - quantity / paginar para cada 10 produtos
+            Dto a usar -> ProductStockQuantityPerCategoryDto
+        *@
+        <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
+            <MudText Class="stockValueQuantity" Typo="Typo.h5" GutterBottom="true">
+                Stock Information
+            </MudText>
+            <MudTable Class="mt-5"
+                      @ref="@StockValueQuantityTable"
+                      Items="@StockValueQuantity" Hover="true" Breakpoint="Breakpoint.Md"
+                      Loading="@_loading" LoadingProgressColor="Color.Primary"
+                      RowsPerPage="10">
+                <HeaderContent>
+                    <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(n => n.Name)">Name </MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(c => c.Category.Category)">Category</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(at => at.AnimalType.AnimalType)">Animal Type</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(ppu => ppu.PricePerUnit)"> Price Per Unit</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(q => q.Quantity)">Quantity</MudTableSortLabel></MudTh>
+                    <MudTh><MudTableSortLabel SortBy="new Func<ProductStockQuantityPerCategoryDto, object>(x => x.Quantity * x.PricePerUnit)">Total Price</MudTableSortLabel></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Category">@context.Category.Category</MudTd>
+                    <MudTd DataLabel="Animal Type">@context.AnimalType.AnimalType</MudTd>
+                    <MudTd DataLabel="Quantity">@context.PricePerUnit</MudTd>
+                    <MudTd DataLabel="PricePerUnit">@context.Quantity</MudTd>
+                    <MudTd DataLabel="TotalPrice">@(@context.Quantity * @context.PricePerUnit)</MudTd>
+                </RowTemplate>
+                <PagerContent>
+                    <MudPagination SelectedChanged="PageChanged"
+                                   Count="@((StockValueQuantityTable.GetFilteredItemsCount() + StockValueQuantityTable.RowsPerPage - 1) / StockValueQuantityTable.RowsPerPage)"
+                                   Class="pa-4" />
+                </PagerContent>
+            </MudTable>
+        </MudContainer>
+        <MudScrollToTop Style="bottom: 1%; right: 0;">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowUpward" />
+        </MudScrollToTop>
+    }
+</div>
+
+
+@code
+{
+    //main lists
+    private List<LowStockProductsDto> LowStockProducts = new();
+    private List<TopProductsSoldPerCategoryDto> TopSoldItems = new();
+    private List<CategoryDto> Categories = new();
+    private List<ChartSeries> chatSeries = new();
+    private List<TopFiveMovementDto> TopFiveMovemens = new();
+    private List<CategoryPricesDto> ValueInStock = new();
+
+
+    private List<MovementPerCategory> EntryPerCategory = new();
+    private List<MovementPerCategory> ExitPerCategory = new();
+
+
+    private List<ProductStockQuantityPerCategoryDto> StockValueQuantity = new();
+    private MudTable<ProductStockQuantityPerCategoryDto> StockValueQuantityTable = new();
+
+    private decimal TotalStockValue => ValueInStock.Sum(x => x.Price);
+    private int TotalEntries => EntryPerCategory?.Sum(e => e.NumberMovements) ?? 0;
+    private int TotalExits => ExitPerCategory?.Sum(e => e.NumberMovements) ?? 0;
+
+    //private decimal TotalPriceStockPerProduct => StockValueQuantity.Sum(x => x.Quantity * x.PricePerUnit);
+
+
+
+    //campos para o topsolds
+    private int _index = -1;
+    private string[] _xAxisLabels;
+
+    //Pie Data
+    private double[] PieData;
+    private string[] PieLabels;
+    private double[] PieDataEntries;
+    private string[] PieLabelsEntries;
+    private double[] PieDataExits;
+    private string[] PieLabelsExits;
+
+    //Serve para ir buscar e trocar a categoria em maneira responsiva
+    private int selectedCategory;
+    private int SelectedCategory
+    {
+        get => selectedCategory;
+        set
+        {
+            if (selectedCategory != value)
+            {
+                selectedCategory = value;
+                _ = LoadTopSoldItems(selectedCategory);
+            }
+        }
+    }
+
+    //campos extra
+    private bool _loading = false;
+    private string Message = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        try
+        {
+            await base.OnInitializedAsync();
+            LowStockProducts = await ApiService.GetLowStockProducts();
+            Categories = await ApiService.GetCategoriesAsync();
+            TopFiveMovemens = await ApiService.GetTopFiveMovements();
+            ValueInStock = await ApiService.GetValueInStock();
+            EntryPerCategory = await ApiService.GetEntryByCategory();
+            ExitPerCategory = await ApiService.GetExitsByCategory();
+            //Para montar o pie com os dados em cima
+            PreparePieChartData();
+            StockValueQuantity = await ApiService.GetStockValueQuantity();
+
+            if (Categories.Any())
+            {
+                SelectedCategory = Categories.First().Id;
+                await LoadTopSoldItems(SelectedCategory);
+            }
+
+            _loading = false;
+        }
+        catch (Exception)
+        {
+
+            Message = "Erro a receber os dados da base de dados";
+        }
+    }
+
+    //bar cart with category change
+
+    private async Task OnCategoryChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int categoryId))
+        {
+            SelectedCategory = categoryId;
+            await LoadTopSoldItems(SelectedCategory);
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadTopSoldItems(int categoryId)
+    {
+
+        var topSold = await ApiService.GetTopSoldProducts(categoryId);
+
+        if (topSold != null && topSold.Any())
+        {
+            chatSeries = new List<ChartSeries>
+{
+            new ChartSeries
+            {
+                Name = "Sold Quantity",
+                Data = topSold.Select(x => (double)x.SoldQuantity).ToArray()
+            }
+        };
+            _xAxisLabels = topSold.Select(x => x.Name).ToArray();
+        }
+        else
+        {
+            chatSeries = new List<ChartSeries>();
+            _xAxisLabels = Array.Empty<string>();
+        }
+    }
+
+    //pie chart
+
+    private void PreparePieChartData()
+    {
+        //pie para value in stock
+        PieData = ValueInStock.Select(x => (double)x.Price).ToArray();
+        PieLabels = ValueInStock.Select(x => x.CategoryName).ToArray();
+
+        //pie para entry per category
+        PieDataEntries = EntryPerCategory.Select(x => (double)x.NumberMovements).ToArray();
+        PieLabelsEntries = EntryPerCategory.Select(x => x.CategoryName).ToArray();
+
+        //pie para exit per category
+        PieDataExits = ExitPerCategory.Select(x => (double)x.NumberMovements).ToArray();
+        PieLabelsExits = ExitPerCategory.Select(x => x.CategoryName).ToArray();
+    }
+
+    //pagination
+    private void PageChanged(int i)
+    {
+        StockValueQuantityTable.NavigateTo(i - 1);
+    }
+}

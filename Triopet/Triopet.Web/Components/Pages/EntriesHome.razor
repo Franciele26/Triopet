@@ -1,0 +1,103 @@
+﻿@page "/entries/"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+@using MudBlazor
+
+<PageTitle>Entries</PageTitle>
+<MudPopoverProvider />
+
+<MudText Typo="Typo.h3" GutterBottom="true" Align="Align.Center">
+    List of Entries
+</MudText>
+<div class="list-group">
+    <MudSnackbarProvider />
+    <MudTable @ref="@EntryTable" Items="@Entry" Hover="true" Breakpoint="Breakpoint.Sm"
+              Loading="@_loading" LoadingProgressColor="Color.Primary" RowsPerPage="6">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<EntryDto, object>(e => e.DateOfEntry)">Date</MudTableSortLabel></MudTh>
+            <MudTh Class="d-flex align-items-center justify-content-center">
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@OnAddEntry">
+                    Add
+                </MudButton>
+            </MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Date">@context.DateOfEntry</MudTd>
+            <MudTd DataLabel="Actions" Class="d-flex align-items-center justify-content-center">
+                <MudIconButton @onclick="() => OnViewEntries(context.Id)"
+                               Variant="Variant.Filled" Icon="@Icons.Material.Outlined.Visibility" Color="Color.Warning"
+                               aria-label="Detail">
+                </MudIconButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudPagination Class="pa-4"
+                           SelectedChanged="OnPageChange" Count="@((EntryTable.GetFilteredItemsCount() + EntryTable.RowsPerPage - 1) / EntryTable.RowsPerPage)" />
+        </PagerContent>
+    </MudTable>
+
+    <h3>@Message</h3>
+
+</div>
+
+@code {
+
+    private List<EntryDto> Entry { get; set; } = new();
+    private MudTable<EntryDto> EntryTable = new();
+
+    private string Message { get; set; } = string.Empty;
+
+    private bool _loading = false;
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        Snackbar.Clear();
+
+        _loading = true;
+
+        try
+
+        {
+
+            Entry = (await ApiService.GetEntries()).ToList();
+
+            await Task.Delay(300);
+            _loading = false;
+
+        }
+
+        catch (Exception)
+
+        {
+
+            Message = "Error, while trying to search for the entry list";
+
+        }
+
+    }
+    private void OnAddEntry()
+    {
+        Nav.NavigateTo($"/addentry");
+    }
+
+    private void OnViewEntries(int id)
+
+    {
+
+        Nav.NavigateTo($"/entrydetails/{id}");
+
+    }
+
+    private void OnPageChange(int i)
+    {
+        EntryTable.NavigateTo(i - 1);
+    }
+
+}

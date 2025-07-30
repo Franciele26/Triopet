@@ -1,0 +1,91 @@
+﻿@page "/exits/"
+@using Triopet.Shared.Models
+@inject IApiService ApiService
+@inject ISnackbar Snackbar
+@inject NavigationManager Nav
+@rendermode InteractiveServer
+@using MudBlazor
+
+<PageTitle>Exits</PageTitle>
+<MudPopoverProvider />
+
+<MudText Typo="Typo.h3" Align="Align.Center" Class="mb-4">
+    List of Exits
+</MudText>
+
+<div class="exit-list">
+    <MudSnackbarProvider />
+    <MudTable @ref="@ExitTable"
+              Items="@Exits" Hover="true" Breakpoint="Breakpoint.Md"
+              Loading="@_loading" LoadingProgressColor="Color.Primary"
+              RowsPerPage="6">
+        <HeaderContent>
+            <MudTh><MudTableSortLabel SortBy="new Func<ExitDto, object>(d => d.DateOfExit)">Date</MudTableSortLabel></MudTh>
+            <MudTh><MudTableSortLabel SortBy="new Func<ExitDto, object>(m => m.Reason.Reason)">Motif</MudTableSortLabel></MudTh>
+            <MudTh Class="d-flex align-items-center justify-content-center">
+                <MudButton Color="Color.Primary" Variant="Variant.Filled" Size="Size.Small"
+                           StartIcon="@Icons.Material.Filled.Add"
+                           OnClick="@OnAddExit">
+                    Add
+                </MudButton>
+            </MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Date">@context.DateOfExit</MudTd>
+            <MudTd DataLabel="Motif">@context.Reason.Reason</MudTd>
+            <MudTd DataLabel="Action" Class="d-flex align-items-center justify-content-center">
+                <MudIconButton @onclick="() => OnViewExits(context.Id)"
+                               Variant="Variant.Filled" Icon="@Icons.Material.Outlined.Visibility" Color="Color.Warning"
+                               aria-label="Detail">
+                </MudIconButton>
+            </MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudPagination SelectedChanged="OnPageChanged" Count="@((ExitTable.GetFilteredItemsCount() + ExitTable.RowsPerPage - 1) / ExitTable.RowsPerPage)"
+                           Class="pa-4" />
+        </PagerContent>
+    </MudTable>
+
+    <h3>@Message</h3>
+
+</div>
+
+@code {
+    private List<ExitDto> Exits { get; set; } = new();
+    private MudTable<ExitDto> ExitTable = new();
+    private string Message { get; set; } = string.Empty;
+    private bool _loading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Snackbar.Clear();
+        _loading = true;
+        try
+        {
+            Exits = (await ApiService.GetExits()).ToList();
+            await Task.Delay(300);
+            _loading = false;
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+
+            Message = "Erro ao tentar procurar lista de saidas";
+        }
+    }
+
+    private void OnAddExit()
+    {
+        Nav.NavigateTo($"/addexit");
+    }
+
+    private void OnViewExits(int id)
+    {
+        Nav.NavigateTo($"/exitsdetails/{id}");
+    }
+
+    private void OnPageChanged(int i)
+    {
+        ExitTable.NavigateTo(i - 1);
+    }
+}
