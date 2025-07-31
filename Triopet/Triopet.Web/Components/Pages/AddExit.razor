@@ -159,8 +159,14 @@
     {
         await base.OnInitializedAsync();
         Reasons = await ApiService.GetReasonsAsync();
-        Products = await ApiService.GetProductsAsync();
-        Categories = await ApiService.GetCategoriesAsync();
+
+        Products = (await ApiService.GetProductsAsync())
+                       .OrderBy(p => p.Name)  // ordenar pelo nome do produto
+                       .ToList();
+
+        Categories = (await ApiService.GetCategoriesAsync())
+                        .OrderBy(c => c.Category)  // ordenar pela categoria
+                        .ToList();
 
         if (Id > 0)
         {

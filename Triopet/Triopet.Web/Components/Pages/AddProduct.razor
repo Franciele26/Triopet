@@ -123,8 +123,12 @@ else
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        Categorias = await ApiService.GetCategoriesAsync();
-        AnimalTypes = await ApiService.GetAnimalTypesAsync();
+        Categorias = (await ApiService.GetCategoriesAsync())
+                        .OrderBy(c => c.Category)
+                        .ToList();
+        AnimalTypes = (await ApiService.GetAnimalTypesAsync())
+                        .OrderBy(t => t.AnimalType)
+                        .ToList();
 
         if (Id > 0)
         {
