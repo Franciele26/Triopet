@@ -126,10 +126,21 @@
                             }
                         </select>
                     </MudStack>
-                    <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                    <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center;">
                         <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
                                   XAxisLabels="@_xAxisLabels"
-                                  Width="90%" Height="50vh" Style="background:#ffffffd2" />
+                                  Width="100%" Height="50vh" Style="background:#ffffffd2" />
+                        <MudTable Items="@TopSoldItems" Class="mt-4 me-3" Dense="true" Hover="true" Bordered="true"
+                                  Style="background-color: #f5f5f5; width: 35%; table-layout: fixed; overflow-x: hidden;">
+                            <HeaderContent>
+                                <MudTh>Produto</MudTh>
+                                <MudTh>Quantidade Vendida</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd Style="overflow:hidden">@(context.Name.Length > 25 ? context.Name.Substring(0, 25) + "..." : context.Name)</MudTd>
+                                <MudTd>@context.SoldQuantity</MudTd>
+                            </RowTemplate>
+                        </MudTable>
                     </MudPaper>
                 </MudStack>
             }
@@ -146,7 +157,7 @@
                 <MudItem xs="12" md="6">
                     <MudTable Items="@ValueInStock" Hover="true" Breakpoint="Breakpoint.Md"
                               Loading="@_loading" LoadingProgressColor="Color.Primary"
-                              Style="border-color:transparent; margin-bottom:1vh">
+                              Style="border-color:transparent; margin-bottom:1vh;">
                         <HeaderContent>
                             <MudTh>Category</MudTh>
                             <MudTh>Value</MudTh>
@@ -361,7 +372,7 @@
 
             EntryPerCategory = await ApiService.GetEntryByCategory();
             ExitPerCategory = await ApiService.GetExitsByCategory();
-            SevenDaysEntries =await ApiService.GetLastSevenDaysEntries();
+            SevenDaysEntries = await ApiService.GetLastSevenDaysEntries();
             SevenDaysExits = await ApiService.GetLastSevenDaysExits();
             //Para montar o pie com os dados em cima
             PreparePieChartData();
@@ -409,13 +420,16 @@
                 Data = topSold.Select(x => (double)x.SoldQuantity).ToArray()
             }
         };
-            _xAxisLabels = topSold.Select(x => x.Name).ToArray();
+            _xAxisLabels = topSold.Select(x =>
+                x.Name.Length > 20 ? x.Name.Substring(0, 20) + "..." : x.Name
+            ).ToArray(); TopSoldItems = topSold.ToList();
         }
         else
         {
             chatSeries = new List<ChartSeries>();
             _xAxisLabels = Array.Empty<string>();
         }
+        StateHasChanged();
     }
 
     //pie chart
