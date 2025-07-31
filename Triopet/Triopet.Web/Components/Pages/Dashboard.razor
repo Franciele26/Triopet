@@ -115,34 +115,34 @@
             }
             else
             {
-                <MudStack Row="false" Class="bar-chart mt-5">
-                    <MudStack Row="true" Style="align-items:center;">
-                        <MudText Typo="Typo.h6">Select a Category:</MudText>
-                        <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
-                            <option value="0">Select a category</option>
-                            @foreach (var item in Categories)
-                            {
-                                <option value="@item.Id">@item.Category</option>
-                            }
-                        </select>
-                    </MudStack>
-                    <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center;">
-                        <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
-                                  XAxisLabels="@_xAxisLabels"
-                                  Width="100%" Height="50vh" Style="background:#ffffffd2" />
-                        <MudTable Items="@TopSoldItems" Class="mt-4 me-3" Dense="true" Hover="true" Bordered="true"
-                                  Style="background-color: #f5f5f5; width: 35%; table-layout: fixed; overflow-x: hidden;">
-                            <HeaderContent>
-                                <MudTh>Produto</MudTh>
-                                <MudTh>Quantidade Vendida</MudTh>
-                            </HeaderContent>
-                            <RowTemplate>
-                                <MudTd Style="overflow:hidden">@(context.Name.Length > 25 ? context.Name.Substring(0, 25) + "..." : context.Name)</MudTd>
-                                <MudTd>@context.SoldQuantity</MudTd>
-                            </RowTemplate>
-                        </MudTable>
-                    </MudPaper>
-                </MudStack>
+        <MudStack Row="false" Class="bar-chart mt-5">
+            <MudStack Row="true" Style="align-items:center;">
+                <MudText Typo="Typo.h6">Select a Category:</MudText>
+                <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
+                    <option value="0">Select a category</option>
+                    @foreach (var item in Categories)
+                    {
+                        <option value="@item.Id">@item.Category</option>
+                    }
+                </select>
+            </MudStack>
+            <MudTable Items="@TopSoldItems" Class="mt-4 me-3" Dense="true" Hover="true" Bordered="true"
+                      Style="background-color: #f5f5f5; width: 35%; table-layout: fixed; overflow-x: hidden;">
+                <HeaderContent>
+                    <MudTh>Produto</MudTh>
+                    <MudTh>Quantidade Vendida</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Style="overflow:hidden">@(context.Name.Length > 25 ? context.Name.Substring(0, 25) + "..." : context.Name)</MudTd>
+                    <MudTd>@context.SoldQuantity</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center;">
+                <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
+                          XAxisLabels="@_xAxisLabels"
+                          Width="100%" Height="50vh" Style="background:#ffffffd2" />
+            </MudPaper>
+        </MudStack>
             }
         </MudContainer>
 
