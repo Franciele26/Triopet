@@ -24,7 +24,21 @@ else
 <EditForm Model="NewEntry" OnValidSubmit="OnAddEntry">
     <DataAnnotationsValidator />
 
+    <div class="form-group">
+        <MudStack Row="true" Style="display: flex;" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+            <MudText Typo="Typo.body1" Style="color:black;">Date Exit:</MudText>
+            <div style="width:10vw">
+                <MudDatePicker Style="color:black"
+                               Class="custom-datepicker"
+                               @bind-Date="EntryDate"
+                               DateFormat="yyyy-MM-dd"
+                               PickerVariant="PickerVariant.Dialog"
+                               AdornmentColor="Color.Surface"
+                               Adornment="Adornment.Start" />
+            </div>
+        </MudStack>
 
+    </div>
 
     <div class="form-group categorySelection">
         <label>
@@ -87,14 +101,28 @@ else
     <ValidationSummary />
 </EditForm>
 
-@if (!string.IsNullOrEmpty(Message))
-{
-    <p class="text-success mt-3">@Message</p>
-}
-
 @code {
     [Parameter]
     public int Id { get; set; }
+
+    //Para ajudar a definir a data do DatePicker
+    private DateTime? EntryDate
+    {
+        get
+        {
+            if (NewEntry.DateOfEntry == default(DateTime))
+                return null;
+            else
+                return NewEntry.DateOfEntry;
+        }
+        set
+        {
+            if (value.HasValue)
+                NewEntry.DateOfEntry = value.Value;
+            else
+                NewEntry.DateOfEntry = DateTime.Today;
+        }
+    }
 
     public string buttonText => Id > 0 ? "Save" : "Add";
 
@@ -106,7 +134,8 @@ else
     private ProductEntryDto List = new();
 
     public EntryDto NewEntry = new();
-    private string Message = string.Empty;
+    private string errorMsg = string.Empty;
+
 
     private List<ProductDto> FilteredProducts => Products
     .Where(p => p.Category != null && p.Category.Id == SelectedCategory)
@@ -115,8 +144,13 @@ else
     {
         await base.OnInitializedAsync();
 
-        Products = await ApiService.GetProductsAsync();
-        Categories = await ApiService.GetCategoriesAsync();
+        Products = (await ApiService.GetProductsAsync())
+                       .OrderBy(p => p.Name)  // ordenar pelo nome do produto
+                       .ToList();
+
+        Categories = (await ApiService.GetCategoriesAsync())
+                        .OrderBy(c => c.Category)  // ordenar pela categoria
+                        .ToList();
 
         if (Id > 0)
         {
@@ -149,7 +183,8 @@ else
             }
             else
             {
-                Snackbar.Add("Error when trying to update an entry", Severity.Error);
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
         else
@@ -162,7 +197,8 @@ else
             }
             else
             {
-                Snackbar.Add("Error when trying to create an entry", Severity.Error);
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
     }

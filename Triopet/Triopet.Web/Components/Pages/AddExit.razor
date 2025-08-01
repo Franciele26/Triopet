@@ -7,7 +7,7 @@
 @rendermode InteractiveServer
 
 <MudSnackbarProvider />
-
+<MudPopoverProvider />
 <div>
 
     @if (Id > 0)
@@ -27,10 +27,20 @@
         <DataAnnotationsValidator />
 
         <div class="form-group">
-            <label>Date Exit:</label>
-            <InputDate class="form-control"
-                       @bind-value="NewExit.DateOfExit"
-                       @bind-value:format="yyyy-MM-ddTHH:mm" />
+            <MudStack Row="true" Style="display: flex;" Justify="Justify.FlexStart" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.body1" Style="color:black;">Date Exit:</MudText>
+                <div style="width:10vw">
+                    <MudDatePicker Style="color:black"
+                                   Class="custom-datepicker"
+                                   @bind-Date="ExitDate"
+                                   DateFormat="yyyy-MM-dd"
+                                   PickerVariant="PickerVariant.Dialog" 
+                                   AdornmentColor="Color.Surface"
+                                   Adornment="Adornment.Start"
+                                   />
+                </div>
+            </MudStack>
+
         </div>
 
         <div class="form-group">
@@ -99,15 +109,31 @@
         <ValidationSummary />
     </EditForm>
 
-    @if (!string.IsNullOrEmpty(Mensagem))
-    {
-        <p class="text-success mt-3">@Mensagem</p>
-    }
 </div>
 
 @code {
     [Parameter]
     public int Id { get; set; }
+
+    //Para ajudar a definir a data do DatePicker
+    private DateTime? ExitDate
+    {
+        get
+        {
+            if (NewExit.DateOfExit == default(DateTime))
+                return null;
+            else
+                return NewExit.DateOfExit;
+        }
+        set
+        {
+            if (value.HasValue)
+                NewExit.DateOfExit = value.Value;
+            else
+                NewExit.DateOfExit = DateTime.Today;
+        }
+    }
+
 
     public string buttonText => Id > 0 ? "Save" : "Add";
 
@@ -117,21 +143,30 @@
     private ProductExitDto List = new();
 
     private ExitDto NewExit = new();
-    private string Mensagem = string.Empty;
 
     private int SelectedCategory;
     private List<CategoryDto> Categories = new();
 
+    //Para fazer a separaçao dos produtos para tar de acordo com a categoria selecionada do select
     private List<ProductDto> FilteredProducts => Products
     .Where(p => p.Category != null && p.Category.Id == SelectedCategory)
     .ToList();
+
+
+    private string errorMsg { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         Reasons = await ApiService.GetReasonsAsync();
-        Products = await ApiService.GetProductsAsync();
-        Categories = await ApiService.GetCategoriesAsync();
+
+        Products = (await ApiService.GetProductsAsync())
+                       .OrderBy(p => p.Name)  // ordenar pelo nome do produto
+                       .ToList();
+
+        Categories = (await ApiService.GetCategoriesAsync())
+                        .OrderBy(c => c.Category)  // ordenar pela categoria
+                        .ToList();
 
         if (Id > 0)
         {
@@ -162,6 +197,7 @@
 
     private async Task OnAddExit()
     {
+
         if (!NewExit.ProductExitDtos.Any())
         {
             Snackbar.Add("You need to add at least one product!", Severity.Error);
@@ -178,7 +214,8 @@
             }
             else
             {
-                Snackbar.Add("Error trying to update this exit", Severity.Error);
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
         else
@@ -191,7 +228,8 @@
             }
             else
             {
-                Snackbar.Add("Error trying to create this exit", Severity.Error);
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
     }

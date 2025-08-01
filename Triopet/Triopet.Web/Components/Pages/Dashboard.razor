@@ -35,14 +35,14 @@
             </MudItem>
             <MudItem xs="12" md="3">
                 <MudPaper Class="pa-4" Elevation="2">
-                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Total Entries</MudText>
-                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@TotalEntries</MudText>
+                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Recent / Total Entries</MudText>
+                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@TotalEntriesSevenDays / @TotalEntries</MudText>
                 </MudPaper>
             </MudItem>
             <MudItem xs="12" md="3">
                 <MudPaper Class="pa-4" Elevation="2">
-                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Total Exits</MudText>
-                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@TotalExits</MudText>
+                    <MudText Typo="Typo.h6" Class="d-flex justify-content-center align-content-center">Recent / Total Exits</MudText>
+                    <MudText Typo="Typo.h5" Class="d-flex justify-content-center align-content-center">@TotalExitSevenDays / @TotalExits</MudText>
                 </MudPaper>
             </MudItem>
         </MudGrid>
@@ -115,23 +115,34 @@
             }
             else
             {
-                <MudStack Row="false" Class="bar-chart mt-5">
-                    <MudStack Row="true" Style="align-items:center;">
-                        <MudText Typo="Typo.h6">Select a Category:</MudText>
-                        <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
-                            <option value="0">Select a category</option>
-                            @foreach (var item in Categories)
-                            {
-                                <option value="@item.Id">@item.Category</option>
-                            }
-                        </select>
-                    </MudStack>
-                    <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center; width: 100%;">
-                        <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
-                                  XAxisLabels="@_xAxisLabels"
-                                  Width="90%" Height="50vh" Style="background:#ffffffd2" />
-                    </MudPaper>
-                </MudStack>
+        <MudStack Row="false" Class="bar-chart mt-5">
+            <MudStack Row="true" Style="align-items:center;">
+                <MudText Typo="Typo.h6">Select a Category:</MudText>
+                <select class="form-control w-25" @onchange="OnCategoryChanged" value="@SelectedCategory">
+                    <option value="0">Select a category</option>
+                    @foreach (var item in Categories)
+                    {
+                        <option value="@item.Id">@item.Category</option>
+                    }
+                </select>
+            </MudStack>
+            <MudTable Items="@TopSoldItems" Class="mt-4 me-3" Dense="true" Hover="true" Bordered="true"
+                      Style="background-color: #f5f5f5; width: 35%; table-layout: fixed; overflow-x: hidden;">
+                <HeaderContent>
+                    <MudTh>Produto</MudTh>
+                    <MudTh>Quantidade Vendida</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd Style="overflow:hidden">@(context.Name.Length > 25 ? context.Name.Substring(0, 25) + "..." : context.Name)</MudTd>
+                    <MudTd>@context.SoldQuantity</MudTd>
+                </RowTemplate>
+            </MudTable>
+            <MudPaper Class="chart-container" style="display: flex; justify-content: center; align-items: center;">
+                <MudChart ChartType="ChartType.Bar" ChartSeries="@chatSeries"
+                          XAxisLabels="@_xAxisLabels"
+                          Width="100%" Height="50vh" Style="background:#ffffffd2" />
+            </MudPaper>
+        </MudStack>
             }
         </MudContainer>
 
@@ -146,7 +157,7 @@
                 <MudItem xs="12" md="6">
                     <MudTable Items="@ValueInStock" Hover="true" Breakpoint="Breakpoint.Md"
                               Loading="@_loading" LoadingProgressColor="Color.Primary"
-                              Style="border-color:transparent; margin-bottom:1vh">
+                              Style="border-color:transparent; margin-bottom:1vh;">
                         <HeaderContent>
                             <MudTh>Category</MudTh>
                             <MudTh>Value</MudTh>
@@ -177,7 +188,7 @@
             categorias para entrada*@
         <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
             <MudText Class="EntriesPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
-                Number of Entries per Category
+                Number of Entries per Category in the last 7 days
             </MudText>
             <MudGrid>
                 <MudItem xs="12" md="6">
@@ -189,16 +200,16 @@
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTable Items="@EntryPerCategory" Hover="true" Breakpoint="Breakpoint.Md"
+                    <MudTable Items="@SevenDaysEntries" Hover="true" Breakpoint="Breakpoint.Md"
                               Loading="@_loading" LoadingProgressColor="Color.Primary"
                               Style="border-color:transparent; margin-bottom:1vh">
                         <HeaderContent>
                             <MudTh>Category</MudTh>
-                            <MudTh>Total Entries</MudTh>
+                            <MudTh>Recent Entries</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="Category">@context.CategoryName</MudTd>
-                            <MudTd DataLabel="TotalEntries">@context.NumberMovements</MudTd>
+                            <MudTd DataLabel="SevenEntries">@context.NumberMovements</MudTd>
                         </RowTemplate>
                     </MudTable>
                 </MudItem>
@@ -211,7 +222,7 @@
             categorias para saida*@
         <MudContainer Class="mt-5" Style="margin-bottom:5vh;">
             <MudText Class="ExitsPerCategory mt-5" Typo="Typo.h4" GutterBottom="true">
-                Number of Exits per Category
+                Number of Exits per Category in the last 7 days
             </MudText>
             <MudGrid>
                 <MudItem xs="12" md="6">
@@ -223,16 +234,16 @@
                     </MudPaper>
                 </MudItem>
                 <MudItem xs="12" md="6">
-                    <MudTable Items="@ExitPerCategory" Hover="true" Breakpoint="Breakpoint.Md"
+                    <MudTable Items="@SevenDaysExits" Hover="true" Breakpoint="Breakpoint.Md"
                               Loading="@_loading" LoadingProgressColor="Color.Primary"
                               Style="border-color:transparent; margin-bottom:1vh">
                         <HeaderContent>
                             <MudTh>Category</MudTh>
-                            <MudTh>Total Exits</MudTh>
+                            <MudTh>Recent Exits</MudTh>
                         </HeaderContent>
                         <RowTemplate>
                             <MudTd DataLabel="Category">@context.CategoryName</MudTd>
-                            <MudTd DataLabel="TotalEntries">@context.NumberMovements</MudTd>
+                            <MudTd DataLabel="ExitsSeven">@context.NumberMovements</MudTd>
                         </RowTemplate>
                     </MudTable>
                 </MudItem>
@@ -296,12 +307,20 @@
 
     private List<MovementPerCategory> EntryPerCategory = new();
     private List<MovementPerCategory> ExitPerCategory = new();
+    private List<MovementPerCategory> SevenDaysEntries = new();
+    private List<MovementPerCategory> SevenDaysExits = new();
 
 
     private List<ProductStockQuantityPerCategoryDto> StockValueQuantity = new();
     private MudTable<ProductStockQuantityPerCategoryDto> StockValueQuantityTable = new();
 
     private decimal TotalStockValue => ValueInStock.Sum(x => x.Price);
+
+    private DateTime SevenDaysAgo = DateTime.Now.AddDays(-7);
+
+
+    private int TotalEntriesSevenDays => SevenDaysEntries?.Sum(e => e.NumberMovements) ?? 0;
+    private int TotalExitSevenDays => SevenDaysExits?.Sum(e => e.NumberMovements) ?? 0;
     private int TotalEntries => EntryPerCategory?.Sum(e => e.NumberMovements) ?? 0;
     private int TotalExits => ExitPerCategory?.Sum(e => e.NumberMovements) ?? 0;
 
@@ -350,8 +369,11 @@
             Categories = await ApiService.GetCategoriesAsync();
             TopFiveMovemens = await ApiService.GetTopFiveMovements();
             ValueInStock = await ApiService.GetValueInStock();
+
             EntryPerCategory = await ApiService.GetEntryByCategory();
             ExitPerCategory = await ApiService.GetExitsByCategory();
+            SevenDaysEntries = await ApiService.GetLastSevenDaysEntries();
+            SevenDaysExits = await ApiService.GetLastSevenDaysExits();
             //Para montar o pie com os dados em cima
             PreparePieChartData();
             StockValueQuantity = await ApiService.GetStockValueQuantity();
@@ -398,13 +420,16 @@
                 Data = topSold.Select(x => (double)x.SoldQuantity).ToArray()
             }
         };
-            _xAxisLabels = topSold.Select(x => x.Name).ToArray();
+            _xAxisLabels = topSold.Select(x =>
+                x.Name.Length > 20 ? x.Name.Substring(0, 20) + "..." : x.Name
+            ).ToArray(); TopSoldItems = topSold.ToList();
         }
         else
         {
             chatSeries = new List<ChartSeries>();
             _xAxisLabels = Array.Empty<string>();
         }
+        StateHasChanged();
     }
 
     //pie chart
@@ -416,12 +441,12 @@
         PieLabels = ValueInStock.Select(x => x.CategoryName).ToArray();
 
         //pie para entry per category
-        PieDataEntries = EntryPerCategory.Select(x => (double)x.NumberMovements).ToArray();
-        PieLabelsEntries = EntryPerCategory.Select(x => x.CategoryName).ToArray();
+        PieDataEntries = SevenDaysEntries.Select(x => (double)x.NumberMovements).ToArray();
+        PieLabelsEntries = SevenDaysEntries.Select(x => x.CategoryName).ToArray();
 
         //pie para exit per category
-        PieDataExits = ExitPerCategory.Select(x => (double)x.NumberMovements).ToArray();
-        PieLabelsExits = ExitPerCategory.Select(x => x.CategoryName).ToArray();
+        PieDataExits = SevenDaysExits.Select(x => (double)x.NumberMovements).ToArray();
+        PieLabelsExits = SevenDaysExits.Select(x => x.CategoryName).ToArray();
     }
 
     //pagination

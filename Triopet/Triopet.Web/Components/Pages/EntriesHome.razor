@@ -27,7 +27,7 @@
             </MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Date">@context.DateOfEntry</MudTd>
+            <MudTd DataLabel="Date">@context.DateOfEntry.ToString("dd/MM/yyyy")</MudTd>
             <MudTd DataLabel="Actions" Class="d-flex align-items-center justify-content-center">
                 <MudIconButton @onclick="() => OnViewEntries(context.Id)"
                                Variant="Variant.Filled" Icon="@Icons.Material.Outlined.Visibility" Color="Color.Warning"

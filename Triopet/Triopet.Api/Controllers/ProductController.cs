@@ -76,7 +76,9 @@ namespace Triopet.Api.Controllers
         public async Task<IActionResult> CreateProduct([FromBody] ProductDto newProduct)
         {
             if (newProduct.Images == null || newProduct.Images.Count == 0)
-                return BadRequest("É obrigatório enviar pelo menos uma imagem.");
+                return BadRequest("It needs to have at least 1 image saved in the product");
+            if (newProduct.PricePerUnit < 0 || newProduct.Quantity < 0)
+                return BadRequest("It's impossible to create a product with either negative value or quantity");
 
             var product = new Product
             {
@@ -103,9 +105,6 @@ namespace Triopet.Api.Controllers
                 _businessContext.Images.Add(image);
             }
 
-            //await _businessContext.SaveChangesAsync(true);
-
-            //return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, newProduct);
             var response = await _businessContext.SaveChangesAsync(true);
             if (response > 0)
             {
@@ -199,6 +198,9 @@ namespace Triopet.Api.Controllers
             {
                 return BadRequest("Error trying to find product");
             }
+
+            if (product.PricePerUnit < 0 || product.Quantity < 0)
+                return BadRequest("It's impossible to create a product with either negative value or quantity");
 
             var existingProduct = await _businessContext.Products.FindAsync(product.Id);
 

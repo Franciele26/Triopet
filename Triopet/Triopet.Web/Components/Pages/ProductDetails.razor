@@ -1,9 +1,11 @@
 ﻿@page "/productdetails/{Id:int}"
 @inject IApiService ApiService
+@inject ISnackbar Snackbar
 @inject NavigationManager NavigationManager
 @using Triopet.Shared.Models
 @rendermode InteractiveServer
 
+<MudSnackbarProvider/>
 <div style="min-height: 100vh; background-color: #e3f2fd71; opacity:80%; padding: 20px; margin: 0;">
     @if (Produto == null)
     {
@@ -61,11 +63,6 @@
                 <MudButton Color="Color.Error" Variant="Variant.Filled" Class="ms-2" OnClick="ExcluirProduto">Delete</MudButton>
                 <MudButton Color="Color.Secondary" Variant="Variant.Outlined" Class="ms-2" OnClick="Voltar">Back</MudButton>
             </div>
-
-            @if (!string.IsNullOrEmpty(Mensagem))
-            {
-                <MudText Color="Color.Success" Class="mt-3">@Mensagem</MudText>
-            }
         </MudContainer>
     }
 </div>
@@ -75,7 +72,7 @@
     public int Id { get; set; }
 
     private ProductDto Produto;
-    private string Mensagem = string.Empty;
+    private string errorMsg = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -99,18 +96,19 @@
             var response = await ApiService.DeleteProduct(Id);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                Mensagem = "Produto excluído com sucesso!";
+                errorMsg = "Produto excluído com sucesso!";
                 StateHasChanged();
                 NavigationManager.NavigateTo("/");
             }
             else
             {
-                Mensagem = "Erro ao apagar!";
+                errorMsg = await response.Content.ReadAsStringAsync();
+                Snackbar.Add(errorMsg, Severity.Error);
             }
         }
         catch
         {
-            Mensagem = "Erro ao excluir o produto.";
+            errorMsg = "Error in trying to erase the product";
         }
     }
 }

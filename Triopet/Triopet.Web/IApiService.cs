@@ -102,6 +102,11 @@ namespace Triopet.Web
         [Get("/exitsPerCategory/")]
         Task<List<MovementPerCategory>> GetExitsByCategory();
 
+        [Get("/sevenLastDaysEntries")]
+        Task<List<MovementPerCategory>> GetLastSevenDaysEntries();
+
+        [Get("/sevenLastDaysExits/")]
+        Task<List<MovementPerCategory>> GetLastSevenDaysExits();
         #endregion
 
     }
